@@ -58,8 +58,3 @@
 - 每个 Demo 独立文件夹，独立 CSS/JS
 - GitHub Pages 一键部署
 
----
-
-## 📄 License
-
-MIT
