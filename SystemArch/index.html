@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CoRide 系统架构全景图</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="arch">
+
+  <!-- ===== MAIN SCREEN ===== -->
+  <div id="screen-main" class="detail-screen show">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <span class="brand">🏗 CoRide 系统架构全景图</span>
+    <span class="subtitle">双端协同 · 三层架构 · 安全隔离</span>
+  </div>
+
+  <!-- Layer 1: Phone -->
+  <div class="layer phone-layer clickable" onclick="goScreen('phone')">
+    <div class="layer-tag l1">第一层</div>
+    <div class="layer-title">📱 用户手机（瘦客户端）</div>
+    <div class="layer-flow">
+      <span class="flow-step done">注册</span><span class="flow-arrow">→</span>
+      <span class="flow-step done">叫车</span><span class="flow-arrow">→</span>
+      <span class="flow-step done">Agent 比价</span><span class="flow-arrow">→</span>
+      <span class="flow-step done">蓝牙握手</span><span class="flow-arrow">→</span>
+      <span class="flow-step done">外部确认</span><span class="flow-arrow">→</span>
+      <span class="flow-step done">评价</span>
+    </div>
+    <div class="layer-badges">
+      <span class="lb no">❌ 不运行 Agent 模型</span>
+      <span class="lb no">❌ 不存偏好数据</span>
+      <span class="lb no">❌ 行程中不参与语音</span>
+    </div>
+  </div>
+
+  <!-- Arrow 1→2 -->
+  <div class="connector c-blue">
+    <div class="conn-line"></div>
+    <div class="conn-label">
+      <span>🔵 蓝牙 5.0 / NFC</span>
+      <span>偏好包加密传输（上车瞬间）</span>
+      <span>下车安全擦除</span>
+    </div>
+  </div>
+
+  <!-- Layer 2: Jetson -->
+  <div class="layer jetson-layer clickable" onclick="goScreen('jetson')">
+    <div class="layer-tag l2">第二层</div>
+    <div class="layer-title">🚗 车端 Jetson Orin Nano（自有算力）</div>
+    <div class="jetson-cols">
+      <div class="jc-card">
+        <div class="jc-icon">🧠</div>
+        <div class="jc-title">SLM 推理</div>
+        <div class="jc-spec">7B · Q4 量化</div>
+        <div class="jc-items">
+          <span>驾驶解释</span>
+          <span>语音对话</span>
+          <span>偏好检索</span>
+        </div>
+      </div>
+      <div class="jc-card">
+        <div class="jc-icon">👁</div>
+        <div class="jc-title">视觉感知</div>
+        <div class="jc-spec">YOLOv8</div>
+        <div class="jc-items">
+          <span>遗留物检测</span>
+          <span>乘客姿态</span>
+          <span>人数计数</span>
+        </div>
+      </div>
+      <div class="jc-card">
+        <div class="jc-icon">🔌</div>
+        <div class="jc-title">CAN 信号</div>
+        <div class="jc-spec">翻译映射</div>
+        <div class="jc-items">
+          <span>只读驾驶信号</span>
+          <span>读写舒适配置</span>
+          <span>读写 IVI</span>
+        </div>
+      </div>
+    </div>
+    <div class="layer-badges">
+      <span class="lb yes">✅ 偏好临时缓存 · 下车安全擦除</span>
+      <span class="lb yes">✅ 与自动驾驶域控制器完全隔离</span>
+    </div>
+  </div>
+
+  <!-- Arrow 2→3 -->
+  <div class="connector c-green">
+    <div class="conn-line"></div>
+    <div class="conn-label">
+      <span>🟢 5G 加密上传</span>
+      <span>行程日志脱敏</span>
+    </div>
+  </div>
+
+  <!-- Layer 3: Cloud -->
+  <div class="layer cloud-layer clickable" onclick="goScreen('cloud')">
+    <div class="layer-tag l3">第三层</div>
+    <div class="layer-title">☁️ CoRide 云端</div>
+    <div class="jetson-cols">
+      <div class="jc-card cloud-card">
+        <div class="jc-icon">🗄</div>
+        <div class="jc-title">用户偏好</div>
+        <div class="jc-spec">向量数据库</div>
+        <div class="jc-items"><span>Qdrant 引擎</span><span>偏好检索 <10ms</span></div>
+      </div>
+      <div class="jc-card cloud-card">
+        <div class="jc-icon">🔗</div>
+        <div class="jc-title">聚合匹配引擎</div>
+        <div class="jc-spec">多运营商</div>
+        <div class="jc-items"><span>比价算法</span><span>最优匹配 <200ms</span></div>
+      </div>
+      <div class="jc-card cloud-card">
+        <div class="jc-icon">🤖</div>
+        <div class="jc-title">LLM 兜底</div>
+        <div class="jc-spec">复杂语义</div>
+        <div class="jc-items"><span>POI 搜索</span><span>兜底推理</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow 3→4 -->
+  <div class="connector c-orange">
+    <div class="conn-line"></div>
+    <div class="conn-label">
+      <span>🟠 RESTful API</span>
+      <span>叫车 / 派单 / 车辆状态</span>
+    </div>
+  </div>
+
+  <!-- Layer 4: Operators -->
+  <div class="layer operator-layer clickable" onclick="goScreen('operators')">
+    <div class="layer-tag l4">第四层</div>
+    <div class="layer-title">🏢 Robotaxi 运营商</div>
+    <div class="op-logos">
+      <div class="op-logo">🤖 小马智行</div>
+      <div class="op-logo">🚗 文远知行</div>
+      <div class="op-logo">🚕 滴滴出行</div>
+      <div class="op-logo">🛵 哈啰出行</div>
+    </div>
+    <div class="layer-badges">
+      <span class="lb yes">✅ CoRide 不碰自动驾驶域控制器</span>
+      <span class="lb yes">✅ CoRide 不抽票成</span>
+      <span class="lb yes">✅ 增量订单边际成本为零</span>
+    </div>
+  </div>
+
+  <!-- Bottom: Data Flow Legend + Metrics -->
+  <div class="flow-legend clickable" onclick="goScreen('dataflow')">
+    <div class="fl-title">三色数据流</div>
+    <div class="fl-items">
+      <div class="fli fli-blue">
+        <div class="fli-head">🔵 语音流</div>
+        <div class="fli-path">SenseVoice → SLM → CosyVoice → 蓝牙 A2DP</div>
+      </div>
+      <div class="fli fli-green">
+        <div class="fli-head">🟢 视觉流</div>
+        <div class="fli-path">舱内摄像头 → YOLOv8 → Jetson 本地（不出车）</div>
+      </div>
+      <div class="fli fli-orange">
+        <div class="fli-head">🟠 控制流</div>
+        <div class="fli-path">CAN 只读驾驶 / CAN 读写舒适 + IVI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="metrics-bar clickable" onclick="goScreen('metrics')">
+    <div class="metric"><span class="m-val">¥33,176</span><span class="m-label">每车每年营收</span></div>
+    <div class="metric"><span class="m-val">75.6%</span><span class="m-label">毛利率</span></div>
+    <div class="metric"><span class="m-val">7.1 月</span><span class="m-label">回本周期</span></div>
+    <div class="metric"><span class="m-val">500 台</span><span class="m-label">首年加装目标</span></div>
+    <div class="metric"><span class="m-val">4 家</span><span class="m-label">接入运营商</span></div>
+  </div><!-- metrics-bar -->
+
+  </div><!-- #screen-main -->
+
+  <!-- ===== DETAIL: 手机端 ===== -->
+  <div id="screen-phone" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">📱 手机端架构详解 — 瘦客户端设计</span>
+    </div>
+    <div class="ds-body">
+      <div class="ds-section">
+        <div class="ds-sec-title">📋 用户流程六步</div>
+        <div class="phone-steps">
+          <div class="ps-step"><div class="ps-num">1</div><div class="ps-info"><div class="ps-name">注册</div><div class="ps-desc">手机号一键注册，绑定支付方式，无需KYC</div></div></div>
+          <div class="ps-step"><div class="ps-num">2</div><div class="ps-info"><div class="ps-name">叫车</div><div class="ps-desc">输入目的地 → 云端匹配 → 多运营商比价返回</div></div></div>
+          <div class="ps-step"><div class="ps-num">3</div><div class="ps-info"><div class="ps-name">Agent 比价</div><div class="ps-desc">聚合4家运营商报价，按价格/等待时间/评分排序</div></div></div>
+          <div class="ps-step"><div class="ps-num">4</div><div class="ps-info"><div class="ps-name">蓝牙握手</div><div class="ps-desc">上车自动蓝牙连接 → AES-256加密传输偏好包 → 下车安全擦除</div></div></div>
+          <div class="ps-step"><div class="ps-num">5</div><div class="ps-info"><div class="ps-name">外部确认</div><div class="ps-desc">下车前弹窗确认：遗失物品检查 / 行程评价预填</div></div></div>
+          <div class="ps-step"><div class="ps-num">6</div><div class="ps-info"><div class="ps-name">评价</div><div class="ps-desc">五星评分 + 标签评价，反馈至云端偏好模型</div></div></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🔐 安全与隐私设计</div>
+        <div class="ds-cards-3">
+          <div class="ds-card"><div class="dsc-icon">🔒</div><div class="dsc-title">蓝牙 5.0 握手</div><div class="dsc-text">上车自动配对，无需手动操作。偏好包 &lt;50KB，AES-256加密传输，&lt;200ms完成</div></div>
+          <div class="ds-card"><div class="dsc-icon">🗑</div><div class="dsc-title">下车安全擦除</div><div class="dsc-text">行程结束自动清除车端偏好缓存。手机不存任何车辆数据，车端不存任何用户身份信息</div></div>
+          <div class="ds-card"><div class="dsc-icon">📵</div><div class="dsc-title">行程中静默</div><div class="dsc-text">手机不参与车内语音交互。所有语音处理在 Jetson 本地完成，不依赖手机算力</div></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">⚡ 为什么是瘦客户端？</div>
+        <div class="ds-cards-3">
+          <div class="ds-card"><div class="dsc-icon">📱</div><div class="dsc-title">零算力依赖</div><div class="dsc-text">不运行任何模型，不消耗手机GPU/CPU。适配千元机，覆盖全价位用户</div></div>
+          <div class="ds-card"><div class="dsc-icon">🔋</div><div class="dsc-title">超低功耗</div><div class="dsc-text">仅蓝牙传输 + UI渲染，行程中耗电 &lt;2%。不装模型 = 不费电</div></div>
+          <div class="ds-card"><div class="dsc-icon">🛡</div><div class="dsc-title">隐私最优</div><div class="dsc-text">偏好数据加密传输，车端临时缓存，下车即擦。手机不留行程痕迹</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Jetson 车端 ===== -->
+  <div id="screen-jetson" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">🚗 Jetson Orin Nano 车端详解</span>
+    </div>
+    <div class="ds-body">
+      <div class="ds-section">
+        <div class="ds-sec-title">🧠 SLM 推理引擎</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">模型</span><span class="dss-val">Qwen2.5-7B-Instruct</span></div>
+          <div class="ds-spec"><span class="dss-label">量化</span><span class="dss-val">INT4 (Q4_K_M)</span></div>
+          <div class="ds-spec"><span class="dss-label">推理延迟</span><span class="dss-val">&lt;300ms / token</span></div>
+          <div class="ds-spec"><span class="dss-label">内存占用</span><span class="dss-val">~5.2GB VRAM</span></div>
+          <div class="ds-spec"><span class="dss-label">吞吐</span><span class="dss-val">15-20 tokens/s</span></div>
+          <div class="ds-spec"><span class="dss-label">上下文</span><span class="dss-val">8K tokens</span></div>
+        </div>
+        <div class="ds-subtitle">能力矩阵</div>
+        <div class="ds-cards-3">
+          <div class="ds-card"><div class="dsc-icon">🗣</div><div class="dsc-title">语音对话</div><div class="dsc-text">SenseVoice → SLM理解 → CosyVoice合成。端到端延迟 &lt;1.5s，支持打断</div></div>
+          <div class="ds-card"><div class="dsc-icon">📖</div><div class="dsc-title">驾驶解释</div><div class="dsc-text">解读CAN信号，用自然语言解释车辆行为：「正在减速，前方200米右转」</div></div>
+          <div class="ds-card"><div class="dsc-icon">🎯</div><div class="dsc-title">偏好检索</div><div class="dsc-text">从蓝牙传入的偏好包中快速匹配：温度、音乐、座椅。本地FAISS索引，&lt;50ms</div></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">👁 视觉感知模块</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">模型</span><span class="dss-val">YOLOv8n (Nano)</span></div>
+          <div class="ds-spec"><span class="dss-label">帧率</span><span class="dss-val">30 FPS</span></div>
+          <div class="ds-spec"><span class="dss-label">推理延迟</span><span class="dss-val">&lt;15ms / 帧</span></div>
+          <div class="ds-spec"><span class="dss-label">检测类别</span><span class="dss-val">人/包/手机/钥匙</span></div>
+          <div class="ds-spec"><span class="dss-label">精度</span><span class="dss-val">mAP@0.5: 92%</span></div>
+          <div class="ds-spec"><span class="dss-label">数据</span><span class="dss-val">本地处理，不出车</span></div>
+        </div>
+        <div class="ds-subtitle">三大检测场景</div>
+        <div class="ds-cards-3">
+          <div class="ds-card"><div class="dsc-icon">🎒</div><div class="dsc-title">遗留物检测</div><div class="dsc-text">乘客下车后扫描座位，检测手机/包/钥匙。发现遗留物触发告警+提醒</div></div>
+          <div class="ds-card"><div class="dsc-icon">🧍</div><div class="dsc-title">乘客姿态</div><div class="dsc-text">识别乘客是否系安全带、是否在座椅上。异常姿态触发安全提醒</div></div>
+          <div class="ds-card"><div class="dsc-icon">🔢</div><div class="dsc-title">人数计数</div><div class="dsc-text">上下车人数自动统计，超员告警。辅助运营数据采集</div></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🔌 CAN 信号网关</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">接口</span><span class="dss-val">CAN 2.0B (500kbps)</span></div>
+          <div class="ds-spec"><span class="dss-label">只读信号</span><span class="dss-val">车速/转向/GPS/门锁</span></div>
+          <div class="ds-spec"><span class="dss-label">读写信号</span><span class="dss-val">空调/座椅/音响/灯光</span></div>
+          <div class="ds-spec"><span class="dss-label">隔离方式</span><span class="dss-val">CAN网关物理隔离</span></div>
+        </div>
+        <div class="ds-subtitle">安全架构</div>
+        <div class="ds-cards-2">
+          <div class="ds-card"><div class="dsc-icon">🛡</div><div class="dsc-title">只读驾驶域</div><div class="dsc-text">车速、转向角、GPS坐标等仅作只读监听。CAN网关确保无法向AD域写入任何信号</div></div>
+          <div class="ds-card"><div class="dsc-icon">🎛</div><div class="dsc-title">读写舒适域</div><div class="dsc-text">空调温度/风量、座椅位置/加热/通风/按摩、音响音量/音源、氛围灯——全部可读写控制</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Cloud ===== -->
+  <div id="screen-cloud" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">☁️ CoRide 云端详解</span>
+    </div>
+    <div class="ds-body">
+      <div class="ds-section">
+        <div class="ds-sec-title">🗄 用户偏好 — Qdrant 向量数据库</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">引擎</span><span class="dss-val">Qdrant v1.8</span></div>
+          <div class="ds-spec"><span class="dss-label">Embedding</span><span class="dss-val">BGE-M3 (1024d)</span></div>
+          <div class="ds-spec"><span class="dss-label">检索延迟</span><span class="dss-val">&lt;10ms (P99)</span></div>
+          <div class="ds-spec"><span class="dss-label">索引规模</span><span class="dss-val">百万级向量</span></div>
+          <div class="ds-spec"><span class="dss-label">更新策略</span><span class="dss-val">增量 + 定时全量</span></div>
+          <div class="ds-spec"><span class="dss-label">相似度</span><span class="dss-val">Cosine / Dot</span></div>
+        </div>
+        <div class="ds-subtitle">偏好维度</div>
+        <div class="pref-grid">
+          <div class="pref-item"><span class="pref-dim">🌡 温度</span><span class="pref-val">22-26°C 区间</span></div>
+          <div class="pref-item"><span class="pref-dim">🎵 音乐</span><span class="pref-val">曲风/音量/电台</span></div>
+          <div class="pref-item"><span class="pref-dim">💺 座椅</span><span class="pref-val">角度/加热/通风</span></div>
+          <div class="pref-item"><span class="pref-dim">💡 灯光</span><span class="pref-val">亮度/色温</span></div>
+          <div class="pref-item"><span class="pref-dim">🗣 语音</span><span class="pref-val">语速/性别/方言</span></div>
+          <div class="pref-item"><span class="pref-dim">📍 常用地</span><span class="pref-val">家/公司/常去</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🔗 聚合匹配引擎</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">算法</span><span class="dss-val">多目标优化匹配</span></div>
+          <div class="ds-spec"><span class="dss-label">匹配延迟</span><span class="dss-val">&lt;200ms (P99)</span></div>
+          <div class="ds-spec"><span class="dss-label">运营商</span><span class="dss-val">4家实时比价</span></div>
+          <div class="ds-spec"><span class="dss-label">QPS</span><span class="dss-val">5000+</span></div>
+        </div>
+        <div class="ds-subtitle">匹配因子权重</div>
+        <div class="factor-bars">
+          <div class="fb-row"><span class="fb-label">价格</span><div class="fb-track"><div class="fb-fill" style="width:40%"></div></div><span class="fb-pct">40%</span></div>
+          <div class="fb-row"><span class="fb-label">等待时间</span><div class="fb-track"><div class="fb-fill" style="width:30%"></div></div><span class="fb-pct">30%</span></div>
+          <div class="fb-row"><span class="fb-label">用户评分</span><div class="fb-track"><div class="fb-fill" style="width:15%"></div></div><span class="fb-pct">15%</span></div>
+          <div class="fb-row"><span class="fb-label">偏好匹配</span><div class="fb-track"><div class="fb-fill" style="width:15%"></div></div><span class="fb-pct">15%</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🤖 LLM 兜底推理</div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">模型</span><span class="dss-val">Qwen2.5-72B</span></div>
+          <div class="ds-spec"><span class="dss-label">触发条件</span><span class="dss-val">SLM置信度 &lt;0.7</span></div>
+          <div class="ds-spec"><span class="dss-label">兜底延迟</span><span class="dss-val">&lt;2s (P99)</span></div>
+          <div class="ds-spec"><span class="dss-label">兜底率</span><span class="dss-val">&lt;3% 请求</span></div>
+        </div>
+        <div class="ds-subtitle">典型兜底场景</div>
+        <div class="ds-cards-3">
+          <div class="ds-card"><div class="dsc-icon">🔍</div><div class="dsc-title">复杂POI搜索</div><div class="dsc-text">「附近有没有人均200以内的安静日料？」— 多条件组合查询</div></div>
+          <div class="ds-card"><div class="dsc-icon">🧩</div><div class="dsc-title">多轮推理</div><div class="dsc-text">「上次那个地方」「比上次便宜一点的」— 需要历史上下文推理</div></div>
+          <div class="ds-card"><div class="dsc-icon">🌐</div><div class="dsc-title">实时信息</div><div class="dsc-text">「今天那边堵不堵？」「现在那边下雨吗？」— 需要联网查询</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Operators ===== -->
+  <div id="screen-operators" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">🏢 运营商接入详解</span>
+    </div>
+    <div class="ds-body">
+      <div class="op-detail-cards">
+        <div class="od-card"><div class="od-logo">🤖</div><div class="od-info"><div class="od-name">小马智行</div><div class="od-stats"><span>250 台</span><span>广州/深圳</span><span>评分 4.8</span></div><div class="od-desc">自研全栈自动驾驶，已获广州/深圳无人化运营牌照</div></div></div>
+        <div class="od-card"><div class="od-logo">🚗</div><div class="od-info"><div class="od-name">文远知行</div><div class="od-stats"><span>120 台</span><span>广州/北京</span><span>评分 4.7</span></div><div class="od-desc">全球首个获中美两地全无人驾驶测试许可的企业</div></div></div>
+        <div class="od-card"><div class="od-logo">🚕</div><div class="od-info"><div class="od-name">滴滴出行</div><div class="od-stats"><span>80 台</span><span>上海/广州</span><span>评分 4.6</span></div><div class="od-desc">最大出行平台，海量订单池与路线数据优势</div></div></div>
+        <div class="od-card"><div class="od-logo">🛵</div><div class="od-info"><div class="od-name">哈啰出行</div><div class="od-stats"><span>50 台</span><span>广州</span><span>评分 4.5</span></div><div class="od-desc">共享出行基因，下沉市场覆盖优势</div></div></div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🤝 CoRide 对运营商的价值</div>
+        <div class="ds-cards-2">
+          <div class="ds-card"><div class="dsc-icon">📈</div><div class="dsc-title">增量订单·零边际成本</div><div class="dsc-text">CoRide 不参与车费分成。通过偏好匹配提升用户体验 → 复购率 ↑ → 订单增量 206%。运营商仅需支付 ¥33,176/车/年的加装费用</div></div>
+          <div class="ds-card"><div class="dsc-icon">🔒</div><div class="dsc-title">安全隔离·不碰AD域</div><div class="dsc-text">CoRide Jetson 通过CAN网关与自动驾驶域物理隔离，只读驾驶信号，仅读写舒适配置。零安全风险接入</div></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">📋 运营商接入流程</div>
+        <div class="phone-steps">
+          <div class="ps-step"><div class="ps-num">1</div><div class="ps-info"><div class="ps-name">签署协议</div><div class="ps-desc">标准化API接入协议 + 数据安全承诺书</div></div></div>
+          <div class="ps-step"><div class="ps-num">2</div><div class="ps-info"><div class="ps-name">API 对接</div><div class="ps-desc">RESTful接口：叫车/派单/车辆状态。7天完成对接</div></div></div>
+          <div class="ps-step"><div class="ps-num">3</div><div class="ps-info"><div class="ps-name">硬件加装</div><div class="ps-desc">Jetson Orin Nano + 舱内摄像头 + CAN网关。2小时/车</div></div></div>
+          <div class="ps-step"><div class="ps-num">4</div><div class="ps-info"><div class="ps-name">上线运营</div><div class="ps-desc">OTA推送Agent固件 → 监控面板上线 → 开始接收CoRide订单</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Data Flow ===== -->
+  <div id="screen-dataflow" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">🌊 三色数据流详解</span>
+    </div>
+    <div class="ds-body">
+      <div class="ds-section">
+        <div class="ds-sec-title">🔵 语音流 — 端到端对话链路</div>
+        <div class="flow-chain">
+          <div class="fc-node"><div class="fc-icon">🎤</div><div class="fc-name">麦克风</div><div class="fc-spec">16kHz 单声道</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">🧠</div><div class="fc-name">SenseVoice</div><div class="fc-spec">ASR &lt;200ms</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">💬</div><div class="fc-name">SLM推理</div><div class="fc-spec">7B Q4 &lt;300ms</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">🔊</div><div class="fc-name">CosyVoice</div><div class="fc-spec">TTS &lt;500ms</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">📡</div><div class="fc-name">蓝牙 A2DP</div><div class="fc-spec">车载音响</div></div>
+        </div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">端到端延迟</span><span class="dss-val">&lt;1.5s</span></div>
+          <div class="ds-spec"><span class="dss-label">打断机制</span><span class="dss-val">能量检测 &gt;阈值</span></div>
+          <div class="ds-spec"><span class="dss-label">ASR精度</span><span class="dss-val">CER &lt;3% (安静)</span></div>
+          <div class="ds-spec"><span class="dss-label">TTS自然度</span><span class="dss-val">MOS &gt;4.2</span></div>
+          <div class="ds-spec"><span class="dss-label">数据</span><span class="dss-val">全程本地，不上云</span></div>
+          <div class="ds-spec"><span class="dss-label">降噪</span><span class="dss-val">RNNoise 前处理</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🟢 视觉流 — 舱内感知·隐私优先</div>
+        <div class="flow-chain">
+          <div class="fc-node"><div class="fc-icon">📷</div><div class="fc-name">舱内摄像头</div><div class="fc-spec">RGB 720p</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">👁</div><div class="fc-name">YOLOv8n</div><div class="fc-spec">推理 &lt;15ms</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">📊</div><div class="fc-name">事件检测</div><div class="fc-spec">遗留物/姿态</div></div>
+          <div class="fc-arrow">→</div>
+          <div class="fc-node"><div class="fc-icon">🔔</div><div class="fc-name">本地告警</div><div class="fc-spec">GUI/语音提示</div></div>
+        </div>
+        <div class="ds-spec-grid">
+          <div class="ds-spec"><span class="dss-label">分辨率</span><span class="dss-val">1280×720 @30fps</span></div>
+          <div class="ds-spec"><span class="dss-label">隐私</span><span class="dss-val">图像不出车</span></div>
+          <div class="ds-spec"><span class="dss-label">仅上传</span><span class="dss-val">事件摘要文本</span></div>
+          <div class="ds-spec"><span class="dss-label">存储</span><span class="dss-val">无持久存储</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🟠 控制流 — CAN 安全分区</div>
+        <div class="ds-cards-2">
+          <div class="ds-card"><div class="dsc-icon">👁</div><div class="dsc-title">只读分区：驾驶信号</div><div class="dsc-text">车速 · 转向角 · GPS · 门锁状态 · 档位 · 刹车 · 里程<br>用途：驾驶解释、到站提醒、安全判断<br>🔒 CAN网关单向隔离，无法写入</div></div>
+          <div class="ds-card"><div class="dsc-icon">✏</div><div class="dsc-title">读写分区：舒适 + IVI</div><div class="dsc-text">空调温度/风量/模式 · 座椅位置/加热/通风/按摩 · 音响音量/音源 · 氛围灯颜色/亮度 · 车窗（后座）<br>🎛 全部可由Agent自动调节</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Metrics ===== -->
+  <div id="screen-metrics" class="detail-screen">
+    <div class="ds-header">
+      <button class="ds-back" onclick="goScreen('main')">← 返回全景图</button>
+      <span class="ds-title">💰 财务模型与关键指标</span>
+    </div>
+    <div class="ds-body">
+      <div class="ds-section">
+        <div class="ds-sec-title">📊 单车年化营收 = ¥33,176</div>
+        <div class="factor-bars">
+          <div class="fb-row"><span class="fb-label">基础功能费</span><div class="fb-track"><div class="fb-fill" style="width:36%"></div></div><span class="fb-pct">¥12,000</span></div>
+          <div class="fb-row"><span class="fb-label">广告/推荐</span><div class="fb-track"><div class="fb-fill" style="width:18%"></div></div><span class="fb-pct">¥5,976</span></div>
+          <div class="fb-row"><span class="fb-label">增值服务</span><div class="fb-track"><div class="fb-fill" style="width:21%"></div></div><span class="fb-pct">¥7,200</span></div>
+          <div class="fb-row"><span class="fb-label">数据服务</span><div class="fb-track"><div class="fb-fill" style="width:24%"></div></div><span class="fb-pct">¥8,000</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">📉 单车年化成本 = ¥8,100</div>
+        <div class="factor-bars">
+          <div class="fb-row"><span class="fb-label">硬件摊销 (3年)</span><div class="fb-track"><div class="fb-fill cost" style="width:55%"></div></div><span class="fb-pct">¥4,500</span></div>
+          <div class="fb-row"><span class="fb-label">5G流量</span><div class="fb-track"><div class="fb-fill cost" style="width:14%"></div></div><span class="fb-pct">¥1,200</span></div>
+          <div class="fb-row"><span class="fb-label">云端推理</span><div class="fb-track"><div class="fb-fill cost" style="width:18%"></div></div><span class="fb-pct">¥1,500</span></div>
+          <div class="fb-row"><span class="fb-label">运维</span><div class="fb-track"><div class="fb-fill cost" style="width:11%"></div></div><span class="fb-pct">¥900</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">📈 ROI 时间线</div>
+        <div class="ds-spec-grid ds-spec-5">
+          <div class="ds-spec"><span class="dss-label">毛利率</span><span class="dss-val gold">75.6%</span></div>
+          <div class="ds-spec"><span class="dss-label">回本周期</span><span class="dss-val gold">7.1 月</span></div>
+          <div class="ds-spec"><span class="dss-label">首年目标</span><span class="dss-val gold">500 台</span></div>
+          <div class="ds-spec"><span class="dss-label">年化营收</span><span class="dss-val gold">¥16.6M</span></div>
+          <div class="ds-spec"><span class="dss-label">年化毛利</span><span class="dss-val gold">¥12.5M</span></div>
+        </div>
+      </div>
+      <div class="ds-section">
+        <div class="ds-sec-title">🔄 单位经济模型</div>
+        <div class="unit-econ">
+          <div class="ue-row"><span>每单平均营收</span><span>¥3.42</span><span>（CoRide不抽成，仅技术服务费）</span></div>
+          <div class="ue-row"><span>每车日均订单</span><span>138 单</span><span>（含CoRide增量订单）</span></div>
+          <div class="ue-row"><span>每单增量成本</span><span>≈¥0</span><span>（边际成本为零）</span></div>
+          <div class="ue-row"><span>运营商ROI</span><span>206%</span><span>（订单从45→138单/天）</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .arch -->
+
+<script src="js/demo.js"></script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>小马智行 · CoRide 渠道看板 — 运营商后台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="brand">🤖 小马智行<span class="sub"> · CoRide 渠道看板</span></div>
+    <div class="date" id="liveDate">2026.07.31 · 15:00 CST</div>
+    <div class="user-badge">👤 运营主管</div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-body">
+        <div class="kpi-val" id="incOrders">138</div>
+        <div class="kpi-label">今日增量订单</div>
+      </div>
+      <div class="kpi-badge up">↑ 12% MoM</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-body">
+        <div class="kpi-val" id="incRevenue">¥41,262</div>
+        <div class="kpi-label">增量流水</div>
+      </div>
+      <div class="kpi-badge up">↑ 15% MoM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🚗</div>
+      <div class="kpi-body">
+        <div class="kpi-val"><span id="fleetOnline">47</span>/50</div>
+        <div class="kpi-label">加装车辆</div>
+      </div>
+      <div class="kpi-badge warn">3 台维护中</div>
+    </div>
+  </div>
+
+  <!-- Middle Row: Heatmap + Vehicle Status -->
+  <div class="mid-row">
+    <!-- Heatmap -->
+    <div class="panel heatmap-panel">
+      <div class="panel-title">🗺 广州订单热力图</div>
+      <div class="heatmap">
+        <!-- Background districts -->
+        <div class="hm-zone" style="top:8%;left:8%;width:22%;height:18%"><span>白云区</span></div>
+        <div class="hm-zone" style="top:8%;left:34%;width:18%;height:14%"><span>天河区</span></div>
+        <div class="hm-zone" style="top:10%;left:56%;width:14%;height:12%"><span>黄埔区</span></div>
+        <div class="hm-zone" style="top:28%;left:10%;width:16%;height:25%"><span>越秀<br>荔湾</span></div>
+        <div class="hm-zone" style="top:28%;left:30%;width:22%;height:32%"><span>海珠区</span></div>
+        <div class="hm-zone" style="top:50%;left:56%;width:14%;height:18%"><span>番禺区</span></div>
+        <!-- Hotspots -->
+        <div class="hm-hot" style="top:5%;left:12%"><span>✈ 白云机场</span><div class="hm-count">CoRide 42单</div></div>
+        <div class="hm-hot" style="top:42%;left:62%"><span>🚄 广州南站</span><div class="hm-count">CoRide 38单</div></div>
+        <div class="hm-hot" style="top:22%;left:30%"><span>🏙 珠江新城</span><div class="hm-count">CoRide 29单</div></div>
+        <!-- Legend -->
+        <div class="hm-legend">
+          <span class="hm-leg-item"><span class="hm-dot coride"></span>CoRide 渠道</span>
+          <span class="hm-leg-item"><span class="hm-dot self"></span>自有渠道</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle Status -->
+    <div class="panel vehicle-panel">
+      <div class="panel-title">🚗 车辆实时状态</div>
+      <div class="veh-list" id="vehList">
+        <div class="vl-item online">
+          <span class="vl-id">#A102</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥22</span><span class="vl-npu">NPU 58%</span>
+        </div>
+        <div class="vl-item online">
+          <span class="vl-id">#A107</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥25</span><span class="vl-npu">NPU 64%</span>
+        </div>
+        <div class="vl-item offline">
+          <span class="vl-id">#A112</span><span class="vl-status">🟡 离线</span><span class="vl-revenue">维护</span><span class="vl-npu">-</span>
+        </div>
+        <div class="vl-item online">
+          <span class="vl-id">#B003</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥19</span><span class="vl-npu">NPU 55%</span>
+        </div>
+        <div class="vl-item online">
+          <span class="vl-id">#B008</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥24</span><span class="vl-npu">NPU 71%</span>
+        </div>
+        <div class="vl-item fault">
+          <span class="vl-id">#B015</span><span class="vl-status">🔴 故障</span><span class="vl-revenue">待修</span><span class="vl-npu">-</span>
+        </div>
+        <div class="vl-item online">
+          <span class="vl-id">#A088</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥31</span><span class="vl-npu">NPU 49%</span>
+        </div>
+        <div class="vl-item online">
+          <span class="vl-id">#A095</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥18</span><span class="vl-npu">NPU 62%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="bottom-row">
+    <!-- 30-day trend -->
+    <div class="panel trend-panel">
+      <div class="panel-title">📈 近 30 天 CoRide 增量订单趋势</div>
+      <div class="trend-chart">
+        <div class="sparkline" id="sparkline">▁▂▃▄▅▆▇█▇▆▅▆▇▇██▇▆▅▆▇█▇▆▅▆▇██▇▆</div>
+        <div class="trend-labels">
+          <span>7/1 · 基线 45 单/天</span>
+          <span>当前 138 单/天 <b style="color:#27ae60">+206%</b></span>
+        </div>
+      </div>
+      <div class="trend-compare">
+        <div class="tc-bar"><div class="tc-label">接入前基线</div><div class="tc-track"><div class="tc-fill old" style="width:33%">45</div></div></div>
+        <div class="tc-bar"><div class="tc-label">当前日均</div><div class="tc-track"><div class="tc-fill new" style="width:100%">138</div></div></div>
+      </div>
+    </div>
+
+    <!-- Jet Health -->
+    <div class="panel jet-panel">
+      <div class="panel-title">🛡️ Jet 设备健康</div>
+      <div class="jet-stats">
+        <div class="js-item">
+          <div class="js-val good">97.4%</div>
+          <div class="js-label">设备在线率</div>
+          <div class="js-bar"><div class="js-fill" style="width:97.4%"></div></div>
+        </div>
+        <div class="js-item">
+          <div class="js-val">62%</div>
+          <div class="js-label">平均 NPU 负载</div>
+          <div class="js-bar"><div class="js-fill warn" style="width:62%"></div></div>
+        </div>
+      </div>
+      <div class="jet-summary">
+        <span>✅ 47 台正常</span><span>🟡 2 台维护</span><span>🔴 1 台故障</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>CoRide 不抽票成 · 增量订单边际成本为零</span>
+    <span>小马智行运营中心</span>
+    <span>日均 23 单 → 138 单 (+500%)</span>
+  </div>
+
+</div>
+
+<script src="js/demo.js"></script>
+</body>
+</html>

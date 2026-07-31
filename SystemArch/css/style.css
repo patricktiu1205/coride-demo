@@ -1,0 +1,169 @@
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060a10;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif}
+.arch{width:1100px;background:linear-gradient(180deg,#080e18,#0a101c);border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px #1a2030,0 0 0 6px #0d1117,0 20px 60px rgba(0,0,0,.5)}
+
+/* ── Top Bar ── */
+.top-bar{background:linear-gradient(180deg,#0f1a28,#0b1320);padding:16px 24px;text-align:center;border-bottom:1px solid #1a2835}
+.top-bar .brand{display:block;font-size:20px;font-weight:700;color:#e0e0e0;letter-spacing:1px}
+.top-bar .subtitle{display:block;font-size:11px;color:#556;margin-top:4px;letter-spacing:2px}
+
+/* ── Layer Base ── */
+.layer{padding:16px 20px;position:relative;border-bottom:1px solid #0f1620}
+.layer-tag{position:absolute;top:12px;right:20px;font-size:9px;padding:3px 10px;border-radius:8px;font-weight:700;color:#fff}
+.layer-tag.l1{background:#4facfe}
+.layer-tag.l2{background:#00d4aa}
+.layer-tag.l3{background:#a78bfa}
+.layer-tag.l4{background:#F5A623}
+.layer-title{font-size:14px;font-weight:700;color:#ccc;margin-bottom:10px}
+.layer-badges{display:flex;gap:10px;margin-top:8px}
+.lb{font-size:9px;padding:3px 10px;border-radius:6px}
+.lb.no{background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
+.lb.yes{background:rgba(39,174,96,.1);color:#27ae60;border:1px solid rgba(39,174,96,.2)}
+
+/* ── Phone Layer ── */
+.phone-layer{background:linear-gradient(180deg,#0d1622,#0b131e)}
+.layer-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.flow-step{font-size:11px;color:#aaa;background:#0f1a28;padding:6px 14px;border-radius:16px;border:1px solid #1a2835}
+.flow-step.done{color:#4facfe;border-color:rgba(79,172,254,.2)}
+.flow-arrow{color:#333;font-size:14px}
+
+/* ── Connector (between layers) ── */
+.connector{display:flex;align-items:center;gap:16px;padding:8px 20px;border-bottom:1px solid #0f1620}
+.conn-line{flex:1;height:2px;border-radius:1px;position:relative}
+.conn-line::after{content:'▼';position:absolute;right:-4px;top:-7px;font-size:10px}
+.c-blue{background:rgba(79,172,254,.04)}.c-blue .conn-line{background:linear-gradient(90deg,transparent,rgba(79,172,254,.5))}.c-blue .conn-line::after{color:#4facfe}
+.c-green{background:rgba(39,174,96,.04)}.c-green .conn-line{background:linear-gradient(90deg,transparent,rgba(39,174,96,.5))}.c-green .conn-line::after{color:#27ae60}
+.c-orange{background:rgba(245,166,35,.04)}.c-orange .conn-line{background:linear-gradient(90deg,transparent,rgba(245,166,35,.5))}.c-orange .conn-line::after{color:#F5A623}
+.conn-label{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:9px;color:#556;white-space:nowrap}
+.conn-label span:first-child{font-weight:600;font-size:10px}
+.c-blue .conn-label span:first-child{color:#4facfe}
+.c-green .conn-label span:first-child{color:#27ae60}
+.c-orange .conn-label span:first-child{color:#F5A623}
+
+/* ── Jetson / Cloud Layer ── */
+.jetson-layer{background:linear-gradient(180deg,#0d1818,#0b1416)}
+.jetson-cols{display:flex;gap:10px}
+.jc-card{flex:1;background:#0f1a20;border-radius:10px;padding:14px;text-align:center;border:1px solid #1a2e35;transition:all .3s}
+.jc-card:hover{border-color:#00d4aa;box-shadow:0 0 20px rgba(0,212,170,.08)}
+.jc-icon{font-size:28px;margin-bottom:6px}
+.jc-title{font-size:12px;font-weight:700;color:#00d4aa;margin-bottom:4px}
+.jc-spec{font-size:9px;color:#445;margin-bottom:8px;font-family:monospace}
+.jc-items{display:flex;flex-direction:column;gap:3px}
+.jc-items span{font-size:9px;color:#667;padding:3px 6px;background:rgba(0,0,0,.2);border-radius:4px}
+
+.cloud-layer{background:linear-gradient(180deg,#100d1d,#0e0d1a)}
+.cloud-card{border-color:#1a1a30!important}
+.cloud-card:hover{border-color:#a78bfa!important;box-shadow:0 0 20px rgba(167,139,250,.08)}
+.cloud-card .jc-title{color:#a78bfa!important}
+
+/* ── Operator Layer ── */
+.operator-layer{background:linear-gradient(180deg,#1a150d,#16130b)}
+.op-logos{display:flex;gap:10px;justify-content:center;margin-bottom:8px}
+.op-logo{font-size:12px;color:#F5A623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.15);padding:8px 20px;border-radius:8px;font-weight:600}
+
+/* ── Flow Legend ── */
+.flow-legend{background:#0a1118;padding:14px 20px;border-bottom:1px solid #0f1620}
+.fl-title{font-size:12px;font-weight:700;color:#888;margin-bottom:10px;text-align:center}
+.fl-items{display:flex;gap:10px}
+.fli{flex:1;padding:10px 14px;border-radius:8px;border-left:3px solid}
+.fli-blue{background:rgba(79,172,254,.06);border-left-color:#4facfe}
+.fli-green{background:rgba(39,174,96,.06);border-left-color:#27ae60}
+.fli-orange{background:rgba(245,166,35,.06);border-left-color:#F5A623}
+.fli-head{font-size:11px;font-weight:700;margin-bottom:4px}
+.fli-blue .fli-head{color:#4facfe}
+.fli-green .fli-head{color:#27ae60}
+.fli-orange .fli-head{color:#F5A623}
+.fli-path{font-size:9px;color:#556;font-family:monospace}
+
+/* ── Metrics Bar ── */
+.metrics-bar{display:flex;gap:0;border-top:1px solid #0f1620}
+.metric{flex:1;text-align:center;padding:14px 8px;border-right:1px solid #0f1620;background:#080e16}
+.metric:last-child{border-right:none}
+.m-val{display:block;font-size:20px;font-weight:700;color:#F5A623}
+.m-label{display:block;font-size:9px;color:#445;margin-top:3px}
+
+/* ── Clickable layers ── */
+.clickable{cursor:pointer;transition:all .2s}
+.clickable:hover{filter:brightness(1.15)}
+
+/* ── Detail Screen ── */
+.detail-screen{display:none;flex-direction:column}
+.detail-screen.show{display:flex}
+.ds-header{display:flex;align-items:center;gap:16px;padding:14px 20px;background:linear-gradient(180deg,#0f1a28,#0b1320);border-bottom:1px solid #1a2835}
+.ds-back{background:rgba(255,255,255,.06);border:1px solid #1a2835;color:#aaa;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:11px;transition:all .2s;white-space:nowrap}
+.ds-back:hover{background:rgba(255,255,255,.1);color:#fff}
+.ds-title{font-size:15px;font-weight:700;color:#e0e0e0}
+.ds-body{flex:1;overflow-y:auto;padding:16px 20px;max-height:calc(100vh - 120px)}
+.ds-section{margin-bottom:20px}
+.ds-sec-title{font-size:13px;font-weight:700;color:#ccc;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #101820}
+.ds-subtitle{font-size:11px;font-weight:600;color:#888;margin:12px 0 8px}
+
+/* Spec Grid */
+.ds-spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ds-spec-grid.ds-spec-5{grid-template-columns:repeat(5,1fr)}
+.ds-spec{background:#0d131c;border:1px solid #151d28;border-radius:8px;padding:10px 12px;text-align:center}
+.dss-label{display:block;font-size:9px;color:#556;margin-bottom:4px}
+.dss-val{display:block;font-size:12px;font-weight:700;color:#ccc;font-family:monospace}
+.dss-val.gold{color:#F5A623}
+
+/* Card Grids */
+.ds-cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ds-cards-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.ds-card{background:#0d131c;border:1px solid #151d28;border-radius:10px;padding:14px;text-align:center;transition:all .2s}
+.ds-card:hover{border-color:#333}
+.dsc-icon{font-size:24px;margin-bottom:8px}
+.dsc-title{font-size:12px;font-weight:700;color:#ccc;margin-bottom:6px}
+.dsc-text{font-size:9px;color:#667;line-height:1.5}
+
+/* Phone Steps */
+.phone-steps{display:flex;flex-direction:column;gap:6px}
+.ps-step{display:flex;align-items:center;gap:12px;background:#0d131c;border:1px solid #151d28;border-radius:8px;padding:10px 14px;transition:all .2s}
+.ps-step:hover{border-color:#4facfe}
+.ps-num{width:24px;height:24px;border-radius:12px;background:#4facfe;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ps-name{font-size:12px;font-weight:600;color:#ccc}
+.ps-desc{font-size:9px;color:#667;margin-top:2px}
+
+/* Preference Grid */
+.pref-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pref-item{background:#0d131c;border:1px solid #151d28;border-radius:6px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.pref-dim{font-size:10px;color:#aaa}
+.pref-val{font-size:9px;color:#556;font-family:monospace}
+
+/* Factor Bars */
+.factor-bars{display:flex;flex-direction:column;gap:8px}
+.fb-row{display:flex;align-items:center;gap:10px}
+.fb-label{width:110px;font-size:10px;color:#888;text-align:right;flex-shrink:0}
+.fb-track{flex:1;height:8px;background:#101820;border-radius:4px;overflow:hidden}
+.fb-fill{height:100%;background:linear-gradient(90deg,#4facfe,#a78bfa);border-radius:4px;transition:width .6s}
+.fb-fill.cost{background:linear-gradient(90deg,#e74c3c,#F5A623)}
+.fb-pct{width:60px;font-size:10px;color:#ccc;font-family:monospace;text-align:left;flex-shrink:0}
+
+/* Flow Chain */
+.flow-chain{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px;flex-wrap:wrap;padding:12px;background:#0d131c;border-radius:10px}
+.fc-node{display:flex;flex-direction:column;align-items:center;background:#111;border:1px solid #1a2835;border-radius:8px;padding:8px 12px;min-width:60px}
+.fc-icon{font-size:20px}
+.fc-name{font-size:10px;font-weight:600;color:#ccc;margin-top:2px}
+.fc-spec{font-size:8px;color:#556;margin-top:1px;font-family:monospace}
+.fc-arrow{font-size:16px;color:#333}
+
+/* Operator Detail Cards */
+.op-detail-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.od-card{display:flex;gap:12px;background:#0d131c;border:1px solid #1a1a30;border-radius:10px;padding:14px;transition:all .2s;align-items:flex-start}
+.od-card:hover{border-color:#F5A623}
+.od-logo{font-size:32px;flex-shrink:0}
+.od-name{font-size:13px;font-weight:700;color:#F5A623;margin-bottom:4px}
+.od-stats{display:flex;gap:10px;margin-bottom:4px}
+.od-stats span{font-size:9px;color:#667;background:rgba(255,255,255,.04);padding:2px 8px;border-radius:4px}
+.od-desc{font-size:9px;color:#556;line-height:1.4}
+
+/* Unit Economics */
+.unit-econ{display:flex;flex-direction:column;gap:6px}
+.ue-row{display:flex;align-items:center;gap:12px;background:#0d131c;border:1px solid #151d28;border-radius:6px;padding:10px 14px}
+.ue-row span:first-child{font-size:10px;color:#888;width:110px;flex-shrink:0}
+.ue-row span:nth-child(2){font-size:12px;font-weight:700;color:#F5A623;font-family:monospace;width:80px;flex-shrink:0}
+.ue-row span:last-child{font-size:9px;color:#556}
+
+/* scrollbar for ds-body */
+.ds-body::-webkit-scrollbar{width:4px}
+.ds-body::-webkit-scrollbar-track{background:#080e14}
+.ds-body::-webkit-scrollbar-thumb{background:#1a2835;border-radius:2px}

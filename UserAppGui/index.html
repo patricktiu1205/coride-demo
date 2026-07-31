@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CoRide App Demo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-wrapper">
+
+  <!-- Phone Frame -->
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen" id="phoneScreen">
+
+      <!-- SCREEN 1: Registration + Onboarding -->
+      <div class="screen active" id="scr1">
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span id="onboardBackBtn" style="cursor:pointer;font-size:18px;display:none" onclick="prevOnboard()">←</span><h2>CoRide</h2><span class="badge">BETA</span></div>
+        <div class="scroll-area">
+          <div class="onboard" id="onboardStep1">
+            <div class="em">🚗</div>
+            <h3>让每一辆 Robotaxi 都认识你</h3>
+            <p class="desc">一个 App 叫所有 Robotaxi。<br>上车自动调好空调、音乐、座椅。<br>下车即忘，不留痕迹。</p>
+            <div class="reg-block">
+              <label>手机号</label>
+              <input type="tel" placeholder="+86 请输入手机号" value="138****8888" readonly style="color:#333">
+            </div>
+            <div class="reg-block">
+              <label>验证码</label>
+              <div class="sms"><input type="text" placeholder="输入验证码" value="****" readonly style="color:#333"><span class="btn btn-primary btn-sm">已发送</span></div>
+            </div>
+            <div style="padding:16px"><span class="btn btn-primary btn-block" onclick="nextOnboard(2)">开始设置偏好 →</span></div>
+          </div>
+          <div class="onboard" id="onboardStep2" style="display:none">
+            <div class="em">🌡️</div>
+            <h3>今天 32°C，空调调到 24°C 可以吗？</h3>
+            <p class="desc">第 1/3 步 · 环境偏好</p>
+            <div class="chs"><span class="ch picked" onclick="pickCh(this)">可以</span><span class="ch" onclick="pickCh(this)">凉一点，22°C</span><span class="ch" onclick="pickCh(this)">再凉一点，20°C</span></div>
+            <div style="padding:16px;display:flex;gap:10px"><span class="btn btn-outline btn-sm" style="flex:1" onclick="prevOnboard()">← 上一步</span><span class="btn btn-primary" style="flex:2" onclick="nextOnboard(3)">继续 →</span></div>
+          </div>
+          <div class="onboard" id="onboardStep3" style="display:none">
+            <div class="em">🎵</div>
+            <h3>路上想听音乐、电台还是安静？</h3>
+            <p class="desc">第 2/3 步 · 音频偏好</p>
+            <div class="chs"><span class="ch picked" onclick="pickCh(this);setAudioPref('music')">来点音乐</span><span class="ch" onclick="pickCh(this);setAudioPref('quiet')">安静模式</span><span class="ch" onclick="pickCh(this);setAudioPref('radio')">听电台</span></div>
+            <div style="padding:16px;display:flex;gap:10px"><span class="btn btn-outline btn-sm" style="flex:1" onclick="prevOnboard()">← 上一步</span><span class="btn btn-primary" style="flex:2" id="audioNextBtn" onclick="nextOnboard(4)">继续 →</span></div>
+          </div>
+          <div class="onboard" id="onboardStep4" style="display:none">
+            <div class="em">🎶</div>
+            <h3>喜欢什么音乐风格？</h3>
+            <p class="desc">第 3/3 步 · 音乐偏好</p>
+            <div class="chs"><span class="ch picked" onclick="pickCh(this)">古典</span><span class="ch" onclick="pickCh(this)">流行</span><span class="ch" onclick="pickCh(this)">爵士</span><span class="ch" onclick="pickCh(this)">随便</span></div>
+            <div style="padding:16px;display:flex;gap:10px"><span class="btn btn-outline btn-sm" style="flex:1" onclick="prevOnboard()">← 上一步</span><span class="btn btn-primary" style="flex:2" onclick="nextOnboard(5)">完成设置 →</span></div>
+          </div>
+          <div class="onboard" id="onboardStep4b" style="display:none">
+            <div class="em">📻</div>
+            <h3>想听什么电台？</h3>
+            <p class="desc">第 3/3 步 · 电台偏好</p>
+            <div class="chs"><span class="ch picked" onclick="pickCh(this)">古典音乐台</span><span class="ch" onclick="pickCh(this)">新闻台</span><span class="ch" onclick="pickCh(this)">交通台</span><span class="ch" onclick="pickCh(this)">随便</span></div>
+            <div style="padding:16px;display:flex;gap:10px"><span class="btn btn-outline btn-sm" style="flex:1" onclick="prevOnboard()">← 上一步</span><span class="btn btn-primary" style="flex:2" onclick="nextOnboard(5)">完成设置 →</span></div>
+          </div>
+          <div class="onboard" id="onboardStep5" style="display:none">
+            <div class="em">✅</div>
+            <h3>偏好设置完成！</h3>
+            <p class="desc">空调 24°C · <span id="doneAudioLabel">古典音乐</span></p>
+            <div class="progress"><div class="fill" style="width:60%"></div></div>
+            <p style="font-size:11px;color:#888">偏好画像 60% · 3 次行程后我会更懂你</p>
+            <div style="padding:16px;display:flex;gap:10px"><span class="btn btn-outline btn-sm" style="flex:1" onclick="prevOnboard()">← 上一步</span><span class="btn btn-gold" style="flex:2" onclick="goToScreen('scr2')">开始叫车 🚗</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: Home - Map + Call -->
+      <div class="screen" id="scr2">
+        <div class="status-bar"><span>9:41</span><span>📶 📍 🔋</span></div>
+        <div style="background:#2C3E80;color:#fff;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;font-size:12px">
+          <span>📍 广州·珠江新城</span><span class="badge" style="background:#F5A623">CoRide Plus 👑</span>
+        </div>
+        <div class="map">
+          <!-- Water/River -->
+          <div style="position:absolute;top:50%;left:0;right:0;height:45px;background:rgba(144,202,249,.35);border-radius:0"></div>
+          <!-- Major roads (horizontal) -->
+          <div style="position:absolute;top:18%;left:0;right:0;height:5px;background:rgba(255,255,255,.7);box-shadow:0 0 2px rgba(0,0,0,.1)"></div>
+          <div style="position:absolute;top:38%;left:0;right:0;height:4px;background:rgba(255,255,255,.55)"></div>
+          <div style="position:absolute;top:62%;left:0;right:0;height:5px;background:rgba(255,255,255,.7);box-shadow:0 0 2px rgba(0,0,0,.1)"></div>
+          <div style="position:absolute;top:82%;left:0;right:0;height:3px;background:rgba(255,255,255,.45)"></div>
+          <!-- Major roads (vertical) -->
+          <div style="position:absolute;top:0;left:18%;width:5px;bottom:0;background:rgba(255,255,255,.7);box-shadow:0 0 2px rgba(0,0,0,.1)"></div>
+          <div style="position:absolute;top:0;left:42%;width:4px;bottom:0;background:rgba(255,255,255,.55)"></div>
+          <div style="position:absolute;top:0;left:65%;width:5px;bottom:0;background:rgba(255,255,255,.7);box-shadow:0 0 2px rgba(0,0,0,.1)"></div>
+          <div style="position:absolute;top:0;left:85%;width:3px;bottom:0;background:rgba(255,255,255,.45)"></div>
+          <!-- Building blocks -->
+          <div style="position:absolute;top:8%;left:4%;width:12%;height:8%;background:rgba(200,200,210,.5);border-radius:2px"></div>
+          <div style="position:absolute;top:10%;left:22%;width:16%;height:6%;background:rgba(200,200,210,.5);border-radius:2px"></div>
+          <div style="position:absolute;top:6%;left:45%;width:16%;height:10%;background:rgba(190,195,205,.5);border-radius:2px"></div>
+          <div style="position:absolute;top:8%;left:70%;width:12%;height:7%;background:rgba(200,200,210,.5);border-radius:2px"></div>
+          <div style="position:absolute;top:42%;left:3%;width:12%;height:6%;background:rgba(200,200,210,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:44%;left:22%;width:14%;height:4%;background:rgba(200,200,210,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:40%;left:45%;width:16%;height:8%;background:rgba(190,195,205,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:66%;left:4%;width:12%;height:6%;background:rgba(200,200,210,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:68%;left:22%;width:16%;height:8%;background:rgba(200,200,210,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:65%;left:45%;width:16%;height:7%;background:rgba(190,195,205,.45);border-radius:2px"></div>
+          <div style="position:absolute;top:86%;left:3%;width:12%;height:8%;background:rgba(200,200,210,.4);border-radius:2px"></div>
+          <div style="position:absolute;top:84%;left:22%;width:16%;height:10%;background:rgba(200,200,210,.4);border-radius:2px"></div>
+          <div style="position:absolute;top:87%;left:45%;width:20%;height:8%;background:rgba(190,195,205,.4);border-radius:2px"></div>
+          <!-- Green areas -->
+          <div style="position:absolute;top:22%;left:2%;width:14%;height:14%;background:rgba(165,214,167,.4);border-radius:8px"></div>
+          <div style="position:absolute;top:26%;left:70%;width:10%;height:10%;background:rgba(165,214,167,.4);border-radius:8px"></div>
+          <div style="position:absolute;top:70%;left:70%;width:12%;height:12%;background:rgba(165,214,167,.4);border-radius:8px"></div>
+          <!-- Landmark labels -->
+          <div style="position:absolute;top:3%;left:8%;font-size:9px;color:#666;font-weight:600;background:rgba(255,255,255,.7);padding:1px 4px;border-radius:3px">天河区</div>
+          <div style="position:absolute;top:15%;left:50%;font-size:9px;color:#666;font-weight:600;background:rgba(255,255,255,.7);padding:1px 4px;border-radius:3px">珠江新城</div>
+          <div style="position:absolute;top:55%;left:28%;font-size:8px;color:#777;background:rgba(255,255,255,.6);padding:1px 3px;border-radius:2px">海珠区</div>
+          <div style="position:absolute;top:78%;left:8%;font-size:8px;color:#777;background:rgba(255,255,255,.6);padding:1px 3px;border-radius:2px">番禺区</div>
+          <!-- Car markers -->
+          <div class="pin xm"></div><div class="map-label" style="top:14%;left:22%">小马×12</div>
+          <div class="pin wy"></div><div class="map-label" style="top:40%;left:52%">文远×8</div>
+          <div class="pin dd"></div><div class="map-label" style="top:62%;left:28%">滴滴×5</div>
+          <div class="pin hl"></div><div class="map-label" style="top:28%;left:74%">哈啰×3</div>
+          <div class="pin me"></div>
+          <div class="pin dest"></div>
+          <div class="map-label" style="bottom:24%;left:36%;font-size:9px;color:#2C3E80;font-weight:700">📍 你在这里</div>
+        </div>
+        <div class="input-card">
+          <div class="price-tag" id="priceTag">预估 ¥22.00-25.00 · 最快 2.3 分钟</div>
+          <!-- 上车点 -->
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f5f6fa;border-radius:10px;margin-bottom:6px">
+            <span style="font-size:16px">🟢</span>
+            <div style="flex:1;font-size:13px;color:#333;font-weight:500">珠江新城·华夏路 30 号</div>
+            <span style="font-size:10px;color:#999">GPS</span>
+          </div>
+          <!-- 目的地 -->
+          <div class="input-row" style="margin-bottom:8px">
+            <span style="font-size:16px">🔴</span>
+            <input type="text" placeholder="你要去哪儿？" value="广州南站" readonly style="flex:1;border:none;outline:none;font-size:14px;background:transparent">
+            <button class="vbtn" onclick="goToScreen('scrVoice')">🎤</button>
+          </div>
+          <!-- 运营商多选 -->
+          <div class="platform-section">
+            <div class="sec-label">选择运营商（可多选）</div>
+            <div class="platform-chips" id="platformChips">
+              <div class="platform-chip on" data-platform="xm" data-price="23.50" onclick="togglePlatform(this)"><span class="chip-dot"></span>小马智行<span class="chip-price">¥23.50</span></div>
+              <div class="platform-chip on" data-platform="wy" data-price="25.00" onclick="togglePlatform(this)"><span class="chip-dot"></span>文远知行<span class="chip-price">¥25.00</span></div>
+              <div class="platform-chip on" data-platform="dd" data-price="22.00" onclick="togglePlatform(this)"><span class="chip-dot"></span>滴滴<span class="chip-price">¥22.00</span></div>
+              <div class="platform-chip on" data-platform="hl" data-price="24.00" onclick="togglePlatform(this)"><span class="chip-dot"></span>哈啰<span class="chip-price">¥24.00</span></div>
+            </div>
+          </div>
+          <!-- 一键呼叫 -->
+          <button class="call-btn" onclick="callRide()">
+            一键呼叫
+            <span class="call-price" id="callPrice">预估 ¥22.00-25.00</span>
+          </button>
+          <div class="quick-row">
+            <span onclick="setDest('家 · 天河城')">🏠 家</span><span onclick="setDest('公司 · IFP')">🏢 公司</span><span onclick="setDest('星巴克 · 花城汇')">☕ 星巴克</span><span onclick="setDest('健身房 · 高德置地')">🏋️ 健身房</span>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="ni active"><span class="ico">🏠</span>首页</div>
+          <div class="ni" onclick="goToScreen('scr6')"><span class="ico">📋</span>行程</div>
+          <div class="ni" onclick="goToScreen('scr7')"><span class="ico">👤</span>我的</div>
+        </div>
+      </div>
+
+      <!-- SCREEN VOICE: Voice interaction -->
+      <div class="screen" id="scrVoice">
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 70px);padding:20px;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);text-align:center">
+          <div style="font-size:13px;color:#888;margin-bottom:20px">🎤 说出你的目的地</div>
+          <div id="voicePulse" style="width:80px;height:80px;border-radius:50%;background:rgba(245,166,35,.2);display:flex;align-items:center;justify-content:center;animation:pulse 1.5s infinite;margin-bottom:24px">
+            <div style="width:56px;height:56px;border-radius:50%;background:#F5A623;display:flex;align-items:center;justify-content:center;font-size:28px">🎤</div>
+          </div>
+          <div style="font-size:18px;color:#fff;font-weight:600;margin-bottom:8px">正在聆听...</div>
+          <div id="voiceText" style="font-size:14px;color:#F5A623;min-height:24px;transition:all .3s">—</div>
+          <div style="margin-top:30px;display:flex;gap:16px">
+            <span class="btn btn-outline" style="color:#fff;border-color:#555" onclick="goBack()">取消</span>
+          </div>
+          <div style="margin-top:auto;font-size:11px;color:#555">语音由车端麦克风采集 · 本地识别后即删</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: Matching - Agent Comparison -->
+      <div class="screen" id="scr3">
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span style="cursor:pointer;font-size:18px" onclick="goBack()">← 返回</span><h2>匹配中...</h2><span></span></div>
+        <div style="padding:8px 16px;font-size:13px;color:#666">为你找到 <b>4</b> 辆 Robotaxi</div>
+        <div class="match-list">
+          <div class="mc rec" onclick="goToScreen('scr4')"><div class="emoji">🔵</div><div class="info"><div class="n">🏆 推荐 · 小马智行 · 凯美瑞</div><div class="m">2.3 分钟 · ★4.9 · 「车内干净」</div></div><div class="pr">¥23.50<small>票价</small></div></div>
+          <div class="mc" onclick="goToScreen('scr4')"><div class="emoji">🟢</div><div class="info"><div class="n">文远知行 · GAC</div><div class="m">3.1 分钟 · ★4.8 · 「空调给力」</div></div><div class="pr">¥25.00<small>票价</small></div></div>
+          <div class="mc" onclick="goToScreen('scr4')"><div class="emoji">🟠</div><div class="info"><div class="n">滴滴自动驾驶 · 埃安 LX</div><div class="m">4.5 分钟 · ★4.7 · 「驾驶平稳」</div></div><div class="pr">¥22.00<small>票价</small></div></div>
+          <div class="mc" onclick="goToScreen('scr4')"><div class="emoji">🟡</div><div class="info"><div class="n">哈啰 · 几何 A</div><div class="m">5.2 分钟 · ★4.6 · 新车</div></div><div class="pr">¥24.00<small>票价</small></div></div>
+        </div>
+        <div class="agent-msg"><div class="dot g"></div><div class="txt"><div class="time">🤖 Agent</div>已按你的偏好筛选——空调 23°C、古典音乐、安静模式。</div></div>
+        <div style="padding:12px 16px 24px;display:flex;gap:10px">
+          <span class="btn btn-gold" style="flex:1" onclick="goToScreen('scr4')">确认叫车</span>
+          <span class="btn btn-outline" style="flex:1">手动选择</span>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: Pre-trip - Preferences Loaded -->
+      <div class="screen" id="scr4">
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span style="cursor:pointer;font-size:18px" onclick="goBack()">← 返回</span><h2>车辆接近中</h2><span></span></div>
+        <div class="car-anim">
+          <div class="car">🚗</div>
+          <div class="eta">约 2 分钟到达 · 粤A·D12345 · 白色凯美瑞</div>
+          <div style="margin-top:10px;display:flex;justify-content:center;gap:4px">
+            <span style="width:6px;height:6px;background:#2C3E80;border-radius:50%;animation:carPulse .8s infinite"></span>
+            <span style="width:6px;height:6px;background:#ccc;border-radius:50%"></span>
+            <span style="width:6px;height:6px;background:#ccc;border-radius:50%"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-weight:700;color:#2C3E80;margin-bottom:10px">✅ 偏好已加载</div>
+          <div class="pref-list">
+            <div class="pref-item"><span class="chk">✓</span> 🌡️ 空调 23°C</div>
+            <div class="pref-item"><span class="chk">✓</span> 🎵 古典钢琴</div>
+            <div class="pref-item"><span class="chk">✓</span> 💺 座椅标准</div>
+            <div class="pref-item"><span class="chk">✓</span> 🌈 暖色氛围灯</div>
+            <div class="pref-item"><span class="chk">✓</span> 🗺️ 常用路线已就绪</div>
+            <div class="pref-item"><span class="chk">✓</span> 🔒 下车自动清除</div>
+          </div>
+          <div class="agent-msg" style="padding:10px 0 0"><div class="dot g"></div><div class="txt"><div class="time">🤖 Agent</div>你的拿铁偏好已备注——途经星巴克时会提醒你。</div></div>
+        </div>
+        <div style="padding:12px 16px 24px;display:flex;gap:10px">
+          <span class="btn btn-gold" style="flex:1" onclick="goToScreen('scr5')">确认上车</span>
+          <span class="btn btn-outline btn-sm">取消订单</span>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: In-trip External Confirmation (Starbucks) -->
+      <div class="screen" id="scr5">
+        <div style="background:linear-gradient(160deg,#e3edf9,#cdddf0);height:100%;position:relative">
+          <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);z-index:5">
+            <span style="background:#2C3E80;color:#fff;padding:4px 12px;border-radius:12px;font-size:12px">🚗 行程中 · 珠江新城→广州南站 · 剩 12 分钟</span>
+          </div>
+          <div class="overlay" style="display:flex">
+            <div class="dialog">
+              <div style="font-size:36px;margin-bottom:8px">☕</div>
+              <h3>星巴克 · 珠江新城店</h3>
+              <p class="sub">照旧？<br>大杯冰拿铁 ×1 · 预计 ¥36<br>到店可取，不增加行程时间</p>
+              <p class="sub" style="color:#F5A623;font-weight:600">🤖 Agent 建议你顺路取</p>
+              <div class="btns">
+                <span class="btn btn-gold" style="flex:1" onclick="goToScreen('scr6')">确认下单</span>
+                <span class="btn btn-outline btn-sm" style="flex:1" onclick="goBack()">跳过</span>
+              </div>
+              <div class="lock-note">🔒 商户不获取你的 CoRide 账户信息<br>使用临时会话 ID，身份完全脱敏</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 6: Post-trip Review & Summary -->
+      <div class="screen" id="scr6">
+        <div class="status-bar"><span>9:52</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><h2>行程结束 🎉</h2><span></span></div>
+        <div class="scroll-area">
+          <div style="text-align:center;padding:16px 0 4px;color:#666;font-size:14px">广州南站 → 珠江新城</div>
+          <div class="card">
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px">📋 行程摘要</div>
+            <div style="font-size:13px;color:#666;margin-bottom:10px">🕐 28 分钟 · 12.3 km · 🔵 小马智行</div>
+            <div class="breakdown">
+              <div class="r"><span>Robotaxi 票价</span><span>¥24.00</span></div>
+              <div style="font-size:11px;color:#888;margin:6px 0 8px;padding-left:8px;border-left:2px solid #F5A623">CoRide 费用明细：</div>
+              <div class="r"><span>基础服务费</span><span>¥2.50</span></div>
+              <div class="r"><span>里程服务费</span><span class="green">¥0（会员全免）</span></div>
+              <div class="r"><span>交互服务费</span><span class="green">¥0（月免额内）</span></div>
+              <div class="r tot"><span>CoRide 合计</span><span>¥2.50</span></div>
+            </div>
+            <div style="background:#fffdf3;border-radius:10px;padding:10px;margin-top:10px;font-size:12px;color:#F5A623;font-weight:600;text-align:center">💎 本月已省 ¥150 · 会员真香</div>
+          </div>
+          <div class="card card-sm" style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">☕</span><div><b>星巴克订单：已取 ✓</b><br><span style="font-size:11px;color:#888">大杯冰拿铁 ¥36</span></div></div>
+          <div class="card">
+            <div style="font-weight:700;font-size:14px;margin-bottom:8px">评价本次行程</div>
+            <div class="stars">★★★★★</div>
+            <div class="tags">
+              <span class="sel">驾驶解释清晰</span><span class="sel">空调温度舒适</span><span>音乐合口味</span><span>路线合理</span>
+            </div>
+          </div>
+          <div style="padding:8px 16px;font-size:11px;color:#27ae60;text-align:center">🔒 你的偏好数据已从车辆彻底清除 · 不留痕迹</div>
+          <div style="padding:8px 16px 24px"><span class="btn btn-primary btn-block" onclick="goToScreen('scr2')">完成</span></div>
+        </div>
+        <div class="bottom-nav">
+          <div class="ni" onclick="goToScreen('scr2')"><span class="ico">🏠</span>首页</div>
+          <div class="ni active"><span class="ico">📋</span>行程</div>
+          <div class="ni" onclick="goToScreen('scr7')"><span class="ico">👤</span>我的</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 7: Profile / Personal Center -->
+      <div class="screen" id="scr7">
+        <div class="status-bar"><span>9:52</span><span>📶 🔋</span></div>
+        <div style="background:#2C3E80;color:#fff;padding:24px 20px 20px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:56px;height:56px;background:#F5A623;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>
+            <div><div style="font-size:20px;font-weight:700">刁先生</div><div style="font-size:12px;opacity:.8">CoRide Plus 会员 · 已用 23 天 👑</div></div>
+          </div>
+        </div>
+        <div class="scroll-area">
+          <div class="stat-grid" style="margin-top:16px">
+            <div class="stat-box"><div class="num">24</div><div class="lbl">本月行程（趟）</div></div>
+            <div class="stat-box"><div class="num" style="color:#27ae60">¥138</div><div class="lbl">本月节省</div></div>
+            <div class="stat-box"><div class="num">6/50</div><div class="lbl">交互次数（免额内）</div></div>
+            <div class="stat-box"><div class="num">4</div><div class="lbl">累计运营商</div></div>
+          </div>
+          <div class="sec-title">⚙️ 我的偏好（点击编辑）</div>
+          <div class="section-list">
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>🌡️ 空调温度</span><span class="pref-val" id="prefTemp">23°C <span class="arrow">▾</span></span>
+              <div class="expand-panel">
+                <div class="temp-slider-wrap">
+                  <div class="temp-val" id="tempDisplay">23°C</div>
+                  <input type="range" min="18" max="28" value="23" id="tempSlider" oninput="updateTemp(this.value)" onclick="event.stopPropagation()">
+                  <div class="temp-range"><span>18°C 凉爽</span><span>28°C 温暖</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>🎵 音乐风格</span><span class="pref-val" id="prefMusic">古典 <span class="arrow">▾</span></span>
+              <div class="expand-panel" id="expandMusic">
+                <div class="ep-opt selected" onclick="event.stopPropagation();pickMusic('古典',this)">古典 <span class="check">✓</span></div>
+                <div class="ep-opt" onclick="event.stopPropagation();pickMusic('流行',this)">流行</div>
+                <div class="ep-opt" onclick="event.stopPropagation();pickMusic('爵士',this)">爵士</div>
+                <div class="ep-opt" onclick="event.stopPropagation();pickMusic('电子',this)">电子</div>
+                <div class="ep-opt" onclick="event.stopPropagation();pickMusic('随便',this)">随便</div>
+              </div>
+            </div>
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>🗺️ 常用地址</span><span>3 个 <span class="arrow">▾</span></span>
+              <div class="expand-panel" id="expandAddr">
+                <div id="addrList">
+                  <div class="addr-item-inline" onclick="event.stopPropagation();openAddrEditor('家','珠江新城 华夏路30号')">
+                    <span class="addr-name">🏠 家</span><span class="addr-detail">珠江新城 华夏路30号</span>
+                  </div>
+                  <div class="addr-item-inline" onclick="event.stopPropagation();openAddrEditor('公司','琶洲大道 保利世贸E座')">
+                    <span class="addr-name">🏢 公司</span><span class="addr-detail">琶洲大道 保利世贸E座</span>
+                  </div>
+                  <div class="addr-item-inline" onclick="event.stopPropagation();openAddrEditor('星巴克','花城汇 北区B1')">
+                    <span class="addr-name">☕ 星巴克</span><span class="addr-detail">花城汇 北区B1</span>
+                  </div>
+                  <div style="text-align:center;padding:8px;font-size:12px;color:#999">+ 添加新地址</div>
+                </div>
+              </div>
+            </div>
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>☕ 消费偏好</span><span class="pref-val" id="prefConsume">冰拿铁 <span class="arrow">▾</span></span>
+              <div class="expand-panel">
+                <p style="font-size:12px;color:#999;text-align:center;padding:8px 0">基于你的星巴克消费记录，Agent 自动学习偏好</p>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0 12px">
+                  <span style="background:#e8f0fe;color:#2C3E80;padding:6px 14px;border-radius:16px;font-size:12px">冰拿铁 ✓</span>
+                  <span style="background:#f0f0f5;color:#999;padding:6px 14px;border-radius:16px;font-size:12px">美式</span>
+                  <span style="background:#f0f0f5;color:#999;padding:6px 14px;border-radius:16px;font-size:12px">抹茶拿铁</span>
+                </div>
+                <p style="font-size:10px;color:#bbb;text-align:center">更多选项将在下次消费后解锁</p>
+              </div>
+            </div>
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>🔊 交互详细度</span><span class="pref-val" id="prefVolume">标准 <span class="arrow">▾</span></span>
+              <div class="expand-panel" id="expandVolume">
+                <div class="triple-toggle">
+                  <div class="tt-opt" onclick="event.stopPropagation();pickVolume('详细',this)">详细</div>
+                  <div class="tt-opt active" onclick="event.stopPropagation();pickVolume('标准',this)">标准</div>
+                  <div class="tt-opt" onclick="event.stopPropagation();pickVolume('静音',this)">静音</div>
+                </div>
+                <div class="vol-desc" style="font-size:11px;color:#999;text-align:center;padding:6px">仅在关键节点播报</div>
+              </div>
+            </div>
+          </div>
+          <div class="sec-title">📋 其他</div>
+          <div class="section-list">
+            <div class="sl-item" onclick="goToScreen('scrTripList')"><span>📜 历史行程</span><span>24 趟 <span class="arrow">›</span></span></div>
+            <div class="sl-item sl-expand" onclick="toggleExpand(this)">
+              <span>💳 支付方式</span><span>微信支付 <span class="arrow">▾</span></span>
+              <div class="expand-panel">
+                <div class="ep-opt selected" onclick="event.stopPropagation()">微信支付 <span class="check">✓ 已绑定</span></div>
+                <div class="ep-opt" onclick="event.stopPropagation()">支付宝 <span style="color:#F5A623;font-size:11px">绑定免密支付</span></div>
+                <div class="ep-opt" onclick="event.stopPropagation()">添加银行卡 <span style="color:#999;font-size:11px">›</span></div>
+                <div style="font-size:10px;color:#bbb;text-align:center;padding:6px 0">免密支付 · 单笔上限¥50 · 日累计¥200</div>
+              </div>
+            </div>
+            <div class="sl-item"><span>🔒 隐私与数据</span><span class="arrow">›</span></div>
+            <div class="sl-item"><span>ℹ️ 关于 CoRide</span><span class="arrow">›</span></div>
+          </div>
+          <div style="padding:16px;text-align:center;font-size:10px;color:#bbb">CoRide v1.0 · Robotaxi 出行体验聚合平台</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="ni" onclick="goToScreen('scr2')"><span class="ico">🏠</span>首页</div>
+          <div class="ni" onclick="goToScreen('scr6')"><span class="ico">📋</span>行程</div>
+          <div class="ni active"><span class="ico">👤</span>我的</div>
+        </div>
+      </div>
+
+      <!-- SCREEN: Trip List -->
+      <div class="screen" id="scrTripList">
+        <div class="status-bar"><span>9:52</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span style="cursor:pointer;font-size:18px" onclick="goBack()">← 返回</span><h2>历史行程</h2><span></span></div>
+        <div class="scroll-area">
+          <div class="card" onclick="goToScreen('scrTripDetail')" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <span style="font-size:32px">🚗</span>
+            <div class="tc-route" style="flex:1">
+              <div class="tc-fromto" style="font-size:14px;font-weight:600;color:#333">珠江新城 → 广州南站</div>
+              <div class="tc-date" style="font-size:11px;color:#999;margin-top:2px">7月29日 09:20 · 28分钟 · 12.3km</div>
+            </div>
+            <div style="text-align:right"><div style="font-weight:700;color:#2C3E80;font-size:15px">¥26.50</div><div style="font-size:10px;color:#27ae60">已完成</div></div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <span style="font-size:32px">🚗</span>
+            <div class="tc-route" style="flex:1">
+              <div class="tc-fromto" style="font-size:14px;font-weight:600;color:#333">广州塔 → 天河城</div>
+              <div class="tc-date" style="font-size:11px;color:#999;margin-top:2px">7月28日 18:30 · 15分钟 · 5.8km</div>
+            </div>
+            <div style="text-align:right"><div style="font-weight:700;color:#2C3E80;font-size:15px">¥14.50</div><div style="font-size:10px;color:#27ae60">已完成</div></div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <span style="font-size:32px">🚗</span>
+            <div class="tc-route" style="flex:1">
+              <div class="tc-fromto" style="font-size:14px;font-weight:600;color:#333">IFP 国际金融中心 → 琶洲</div>
+              <div class="tc-date" style="font-size:11px;color:#999;margin-top:2px">7月27日 08:15 · 22分钟 · 9.1km</div>
+            </div>
+            <div style="text-align:right"><div style="font-weight:700;color:#2C3E80;font-size:15px">¥19.00</div><div style="font-size:10px;color:#27ae60">已完成</div></div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <span style="font-size:32px">🚗</span>
+            <div class="tc-route" style="flex:1">
+              <div class="tc-fromto" style="font-size:14px;font-weight:600;color:#333">白云机场 → 珠江新城</div>
+              <div class="tc-date" style="font-size:11px;color:#999;margin-top:2px">7月26日 22:10 · 45分钟 · 38.5km</div>
+            </div>
+            <div style="text-align:right"><div style="font-weight:700;color:#2C3E80;font-size:15px">¥76.00</div><div style="font-size:10px;color:#27ae60">已完成</div></div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <span style="font-size:32px">🚗</span>
+            <div class="tc-route" style="flex:1">
+              <div class="tc-fromto" style="font-size:14px;font-weight:600;color:#333">天河客运站 → 大学城</div>
+              <div class="tc-date" style="font-size:11px;color:#999;margin-top:2px">7月25日 14:00 · 32分钟 · 16.2km</div>
+            </div>
+            <div style="text-align:right"><div style="font-weight:700;color:#2C3E80;font-size:15px">¥34.00</div><div style="font-size:10px;color:#27ae60">已完成</div></div>
+          </div>
+          <div style="padding:16px;text-align:center;font-size:11px;color:#bbb">仅展示最近 30 天行程</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="ni" onclick="goToScreen('scr2')"><span class="ico">🏠</span>首页</div>
+          <div class="ni active"><span class="ico">📋</span>行程</div>
+          <div class="ni" onclick="goToScreen('scr7')"><span class="ico">👤</span>我的</div>
+        </div>
+      </div>
+
+      <!-- SCREEN: Trip Detail -->
+      <div class="screen" id="scrTripDetail">
+        <div class="status-bar"><span>9:52</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span style="cursor:pointer;font-size:18px" onclick="goBack()">← 返回</span><h2>行程详情</h2><span></span></div>
+        <div class="scroll-area">
+          <div style="text-align:center;padding:12px 0 4px;font-size:14px;color:#666">珠江新城 → 广州南站</div>
+          <div class="card">
+            <div style="font-weight:700;font-size:15px;margin-bottom:10px">📋 订单信息</div>
+            <div style="font-size:13px;color:#666;margin-bottom:10px">🕐 7月29日 09:20 · 28 分钟 · 12.3 km · 🔵 小马智行</div>
+            <div style="font-size:12px;color:#999;margin-bottom:10px">车牌：粤A·D12345 · 白色凯美瑞</div>
+            <div class="breakdown">
+              <div class="r"><span>Robotaxi 票价</span><span>¥24.00</span></div>
+              <div style="font-size:11px;color:#888;margin:6px 0 8px;padding-left:8px;border-left:2px solid #F5A623">CoRide 费用明细：</div>
+              <div class="r"><span>基础服务费</span><span>¥2.50</span></div>
+              <div class="r"><span>里程服务费</span><span class="green">¥0（会员全免）</span></div>
+              <div class="r tot"><span>合计</span><span>¥26.50</span></div>
+            </div>
+            <div style="background:#fffdf3;border-radius:10px;padding:10px;margin-top:10px;font-size:12px;color:#F5A623;font-weight:600;text-align:center">💎 会员省了 ¥3.50</div>
+          </div>
+          <div class="card card-sm" style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">☕</span><div><b>星巴克订单：已取 ✓</b><br><span style="font-size:11px;color:#888">大杯冰拿铁 ¥36 · 顺路不绕行</span></div></div>
+          <div class="card">
+            <div style="font-weight:700;font-size:14px;margin-bottom:8px">⭐ 我的评价</div>
+            <div class="stars">★★★★★</div>
+            <div class="tags"><span class="sel">驾驶解释清晰</span><span class="sel">空调温度舒适</span><span>音乐合口味</span></div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="ni" onclick="goToScreen('scr2')"><span class="ico">🏠</span>首页</div>
+          <div class="ni active"><span class="ico">📋</span>行程</div>
+          <div class="ni" onclick="goToScreen('scr7')"><span class="ico">👤</span>我的</div>
+        </div>
+      </div>
+
+      <!-- SCREEN: Address Editor -->
+      <div class="screen" id="scrAddrEdit">
+        <div class="status-bar"><span>9:52</span><span>📶 🔋</span></div>
+        <div class="nav-bar"><span style="cursor:pointer;font-size:18px" onclick="goBack()">← 返回</span><h2>编辑地址</h2><span></span></div>
+        <div style="padding:20px">
+          <div style="margin-bottom:16px">
+            <label style="font-size:13px;color:#666;display:block;margin-bottom:6px">地址名称</label>
+            <input id="addrEditName" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none">
+          </div>
+          <div style="margin-bottom:16px">
+            <label style="font-size:13px;color:#666;display:block;margin-bottom:6px">详细地址</label>
+            <input id="addrEditDetail" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none">
+          </div>
+        </div>
+        <div style="padding:12px 20px 24px">
+          <span class="btn btn-gold btn-block" style="margin:0" onclick="saveAddrAndBack()">保存</span>
+        </div>
+        <div style="padding:0 20px 12px;text-align:center;font-size:10px;color:#bbb">地址仅在 CoRide 内使用 · 不同步到运营商</div>
+      </div>
+
+    </div><!-- /phone-screen -->
+  </div><!-- /phone-frame -->
+
+  <!-- Info Panel -->
+  <div id="infoPanel" style="color:#fff;max-width:360px;font-size:14px;line-height:1.8">
+    <h2 style="color:#F5A623;margin-bottom:12px">🖥️ CoRide App Demo</h2>
+    <p style="margin-bottom:8px;opacity:.8">10 屏交互原型 · 点击手机界面操作</p>
+    <div style="background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-top:12px">
+      <div style="font-weight:700;color:#F5A623;margin-bottom:8px">📱 屏幕导航</div>
+      <div style="font-size:12px;opacity:.8">
+        <div>1️⃣ 注册 + 偏好录入（对话引导）</div>
+        <div>2️⃣ 首页 · 聚合叫车 + 多运营商地图</div>
+        <div>🎤 语音交互 · 说出目的地</div>
+        <div>3️⃣ 匹配中 · Agent 比价（4 家运营商）</div>
+        <div>4️⃣ 行前 · 偏好加载确认 + 车辆接近</div>
+        <div>5️⃣ 行程中 · 星巴克外部确认弹窗</div>
+        <div>6️⃣ 行程后 · 费用明细 + 评价 + 隐私确认</div>
+        <div>7️⃣ 个人中心 · 偏好管理 + 会员统计</div>
+        <div>📋 历史行程列表 · 多订单浏览</div>
+        <div>📋 行程详情 · 单笔订单明细</div>
+        <div>✏️ 地址编辑 · 常用地址管理</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-top:12px">
+      <div style="font-weight:700;color:#F5A623;margin-bottom:8px">🎨 设计要点</div>
+      <div style="font-size:12px;opacity:.8">
+        <div>· 手机端为纯瘦客户端，不运行 Agent 模型</div>
+        <div>· 行程中语音由车端麦克风采集，手机不参与</div>
+        <div>· 外部服务须手机端确认（§4.2）</div>
+        <div>· 偏好数据加密存云端，下车安全擦除</div>
+        <div>· 票价与 CoRide 费用分列，透明展示</div>
+      </div>
+    </div>
+    <p style="font-size:10px;opacity:.4;margin-top:16px">内容来源：方案书V2.0 §4.2 / §4.6 / §4.7 / §5.2</p>
+  </div>
+</div>
+<script src="js/demo.js"></script>
+</body>
+</html>

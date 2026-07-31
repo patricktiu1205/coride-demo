@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CoRide In-Car Agent — 车内交互界面</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="car-display">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="brand"><span class="dot"></span>CoRide</div>
+    <div class="greeting">下午好，刁先生 · 行程中</div>
+    <div class="member">👑 CoRide Plus</div>
+  </div>
+
+  <!-- Main Area -->
+  <div class="main-area">
+
+    <!-- Map (Left) -->
+    <div class="map-area" id="mapArea">
+      <!-- Water -->
+      <div class="water"></div>
+      <!-- Roads -->
+      <div class="road-h" style="top:18%;height:4px"></div>
+      <div class="road-h" style="top:38%;height:3px"></div>
+      <div class="road-h" style="top:62%;height:4px"></div>
+      <div class="road-h" style="top:82%;height:3px"></div>
+      <div class="road-v" style="left:20%"></div>
+      <div class="road-v" style="left:45%"></div>
+      <div class="road-v" style="left:62%"></div>
+      <div class="road-v" style="left:85%"></div>
+      <!-- Building blocks -->
+      <div class="block" style="top:6%;left:4%;width:14%;height:8%"></div>
+      <div class="block" style="top:5%;left:24%;width:16%;height:6%"></div>
+      <div class="block" style="top:8%;left:48%;width:12%;height:7%"></div>
+      <div class="block" style="top:42%;left:3%;width:14%;height:5%"></div>
+      <div class="block" style="top:44%;left:24%;width:16%;height:4%"></div>
+      <div class="block" style="top:40%;left:50%;width:10%;height:6%"></div>
+      <div class="block" style="top:66%;left:5%;width:12%;height:5%"></div>
+      <div class="block" style="top:68%;left:26%;width:14%;height:4%"></div>
+      <div class="block" style="top:64%;left:50%;width:10%;height:5%"></div>
+      <div class="block" style="top:86%;left:4%;width:14%;height:8%"></div>
+      <div class="block" style="top:84%;left:24%;width:16%;height:8%"></div>
+      <!-- Parks -->
+      <div class="park" style="top:22%;left:4%;width:14%;height:12%"></div>
+      <div class="park" style="top:26%;left:68%;width:10%;height:10%"></div>
+      <div class="park" style="top:68%;left:72%;width:12%;height:10%"></div>
+      <!-- Labels -->
+      <div class="label" style="top:3%;left:8%">天河区</div>
+      <div class="label" style="top:14%;left:50%">珠江新城</div>
+      <div class="label" style="top:52%;left:30%">海珠区</div>
+      <div class="label" style="top:78%;left:8%">番禺区</div>
+      <!-- Route line -->
+      <div class="route" style="top:20%;left:14%;width:65%;transform:rotate(-8deg)"></div>
+      <div class="route" style="top:24%;left:14%;width:42%;transform:rotate(12deg)"></div>
+      <!-- Route dots -->
+      <div class="route-dot" style="top:19%;left:35%"></div>
+      <div class="route-dot" style="top:21%;left:55%"></div>
+      <!-- Pins -->
+      <div class="pin start">📍</div>
+      <div class="pin end">🎯</div>
+      <div class="pin via">☕</div>
+      <!-- CAN bubble -->
+      <div class="can-bubble" id="canBubble" style="display:none">
+        <div class="can-icon">⚠️ 行人横穿</div>
+        <div class="can-text">前方 200m · 建议减速</div>
+        <div class="can-sub">CAN 信号 · 实时标注</div>
+      </div>
+      <!-- Via tag -->
+      <div class="via-tag">☕ 星巴克 · 3min 后到达</div>
+      <!-- Timeline -->
+      <div class="timeline">
+        <span>珠江新城</span>
+        <div class="tl-bar"><div class="tl-fill"></div><div class="tl-dot"></div></div>
+        <span class="tl-eta" id="tlEta">12 min</span>
+        <span>广州南站</span>
+      </div>
+    </div>
+
+    <!-- Right Side -->
+    <div class="right-side">
+      <!-- Agent Chat -->
+      <div class="agent-chat" id="agentChat">
+        <div class="msg" style="display:none" id="msg1">
+          <div class="dot g"></div>
+          <div class="bubble"><div class="time">12:03 · Agent</div>正在变道——避开前方慢车</div>
+        </div>
+        <div class="msg" style="display:none" id="msg2">
+          <div class="dot g"></div>
+          <div class="bubble"><div class="time">12:03 · Agent</div>偏好已加载：空调 23°C · 古典音乐</div>
+        </div>
+        <div class="msg" style="display:none" id="msg3">
+          <div class="dot g"></div>
+          <div class="bubble"><div class="time">12:04 · Agent</div>预计 3 分钟后到达星巴克 ☕<br>照旧：大杯冰拿铁 ¥36，到店可取</div>
+        </div>
+        <div class="msg" style="display:none" id="msg4">
+          <div class="dot y"></div>
+          <div class="bubble">
+            <div class="time">12:05 · Agent</div>检测到前方拥堵——切换更快路线？<br>预计节省 4 分钟
+            <div class="btns">
+              <span class="yes" onclick="routeConfirm(true)">是，切换</span>
+              <span class="no" onclick="routeConfirm(false)">不用</span>
+            </div>
+          </div>
+        </div>
+        <div class="msg" style="display:none" id="msg5">
+          <div class="dot g"></div>
+          <div class="bubble"><div class="time">12:05 · Agent</div>已切换到最优路线 ✓<br>预计 8 分钟后到达广州南站</div>
+        </div>
+        <div class="msg" style="display:none" id="msg6">
+          <div class="dot g"></div>
+          <div class="bubble"><div class="time">12:06 · Agent</div>到达星巴克，拿铁已备好 ☕</div>
+        </div>
+      </div>
+
+      <!-- Env Status Bar (read-only, click to edit) -->
+      <div class="env-status">
+        <div class="es-item" onclick="openSheet('temp')">
+          <span class="es-icon">🌡️</span><span class="es-val" id="envTemp">23°C</span><span class="es-label">空调</span>
+        </div>
+        <div class="es-item" onclick="openSheet('music')">
+          <span class="es-icon">🎵</span><span class="es-val" id="envMusic">古典</span><span class="es-label">音乐</span>
+        </div>
+        <div class="es-item" onclick="openSheet('seat')">
+          <span class="es-icon">💺</span><span class="es-val" id="envSeat" style="font-size:10px">🔥关·💨关·💆关</span><span class="es-label">座椅调节</span>
+        </div>
+        <div class="es-item" onclick="openSheet('light')">
+          <span class="es-icon">🌈</span><span class="es-val" id="envLight">暖色</span><span class="es-label">灯光</span>
+        </div>
+      </div>
+      <!-- Trip Summary Mini -->
+      <div class="trip-mini">
+        <div class="tm-row"><span>🎫 Robotaxi 票价</span><span>¥24.00</span></div>
+        <div class="tm-row"><span>CoRide 服务费</span><span>¥2.50</span></div>
+        <div class="tm-row highlight"><span>💎 会员已省</span><span>¥150 · 交互 1/50</span></div>
+      </div>
+
+      <!-- Voice Bar -->
+      <div class="voice-bar">
+        <button class="voice-btn" id="voiceBtn" onmousedown="startVoice()" onmouseup="stopVoice()" onmouseleave="stopVoice()" ontouchstart="startVoice()" ontouchend="stopVoice()">
+          <span class="mic">🎤</span> 按住说话
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Overlay -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+  <!-- Temp Sheet -->
+  <div class="env-sheet" id="sheetTemp">
+    <div class="sheet-handle"></div><div class="sheet-title">🌡️ 空调温度</div>
+    <div class="sheet-body">
+      <div class="temp-display" id="sheetTempVal">23°C</div>
+      <input type="range" min="18" max="28" value="23" id="sheetTempSlider" oninput="adjustTemp(this.value)">
+      <div class="temp-labels"><span>18°C 凉爽</span><span>28°C 温暖</span></div>
+    </div>
+  </div>
+
+  <!-- Music Sheet -->
+  <div class="env-sheet" id="sheetMusic">
+    <div class="sheet-handle"></div><div class="sheet-title">🎵 车内多媒体</div>
+    <div class="sheet-body">
+      <div class="sheet-tabs" id="musicTabs">
+        <span class="st-tab active" onclick="switchMusicTab('music',this)">🎵 音乐</span>
+        <span class="st-tab" onclick="switchMusicTab('radio',this)">📻 电台</span>
+        <span class="st-tab" onclick="switchMusicTab('mute',this)">🔇 静音</span>
+      </div>
+      <div class="sheet-tab-body" id="musicPanel">
+        <div class="sheet-opt selected" onclick="pickMusic('古典',this)">古典 <span class="chk">✓</span></div>
+        <div class="sheet-opt" onclick="pickMusic('流行',this)">流行</div>
+        <div class="sheet-opt" onclick="pickMusic('爵士',this)">爵士</div>
+        <div class="sheet-opt" onclick="pickMusic('电子',this)">电子</div>
+        <div class="sheet-opt" onclick="pickMusic('安静',this)">安静</div>
+      </div>
+      <div class="sheet-tab-body" id="radioPanel" style="display:none">
+        <div class="sheet-opt" onclick="pickRadio('城市之声',this)">📻 城市之声</div>
+        <div class="sheet-opt" onclick="pickRadio('音乐之声',this)">📻 音乐之声</div>
+        <div class="sheet-opt" onclick="pickRadio('交通广播',this)">📻 交通广播</div>
+        <div class="sheet-opt" onclick="pickRadio('古典音乐台',this)">📻 古典音乐台</div>
+      </div>
+      <div class="sheet-tab-body" id="mutePanel" style="display:none">
+        <div class="mute-hint">🔇 已开启静音模式<br><span>仅保留安全警报提示音</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seat Sheet -->
+  <div class="env-sheet" id="sheetSeat">
+    <div class="sheet-handle"></div><div class="sheet-title">💺 座椅模式调节</div>
+    <div class="sheet-body">
+      <div class="sheet-tabs" id="seatTabs">
+        <span class="st-tab active" onclick="switchSeatTab('heat',this)">🔥 加热</span>
+        <span class="st-tab" onclick="switchSeatTab('vent',this)">💨 通风</span>
+        <span class="st-tab" onclick="switchSeatTab('massage',this)">💆 按摩</span>
+      </div>
+      <div class="sheet-tab-body" id="heatPanel">
+        <div class="seat-levels">
+          <span class="sl-btn selected" onclick="setSeatLevel('heat','关',this)">关</span>
+          <span class="sl-btn" onclick="setSeatLevel('heat','低',this)">低</span>
+          <span class="sl-btn" onclick="setSeatLevel('heat','中',this)">中</span>
+          <span class="sl-btn" onclick="setSeatLevel('heat','高',this)">高</span>
+        </div>
+      </div>
+      <div class="sheet-tab-body" id="ventPanel" style="display:none">
+        <div class="seat-levels">
+          <span class="sl-btn selected" onclick="setSeatLevel('vent','关',this)">关</span>
+          <span class="sl-btn" onclick="setSeatLevel('vent','低',this)">低</span>
+          <span class="sl-btn" onclick="setSeatLevel('vent','中',this)">中</span>
+          <span class="sl-btn" onclick="setSeatLevel('vent','高',this)">高</span>
+        </div>
+      </div>
+      <div class="sheet-tab-body" id="massagePanel" style="display:none">
+        <div class="seat-levels">
+          <span class="sl-btn selected" onclick="setSeatLevel('massage','关',this)">关</span>
+          <span class="sl-btn" onclick="setSeatLevel('massage','低',this)">低</span>
+          <span class="sl-btn" onclick="setSeatLevel('massage','中',this)">中</span>
+          <span class="sl-btn" onclick="setSeatLevel('massage','高',this)">高</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Light Sheet -->
+  <div class="env-sheet" id="sheetLight">
+    <div class="sheet-handle"></div><div class="sheet-title">🌈 氛围灯</div>
+    <div class="sheet-body">
+      <div class="sheet-opt selected" onclick="pickLight('暖色',this)">暖色 <span class="chk">✓</span></div>
+      <div class="sheet-opt" onclick="pickLight('冷色',this)">冷色</div>
+      <div class="sheet-opt" onclick="pickLight('紫色',this)">紫色</div>
+      <div class="sheet-opt" onclick="pickLight('自动',this)">自动</div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="bb-item"><span class="bb-icon">🛡️</span> CAN 只读 · 本地推理</div>
+    <div class="bb-item">Jet NPU 62%</div>
+    <div class="bb-item"><span class="bb-icon">🔒</span> 下车即删</div>
+  </div>
+
+  <div class="info-tag">Jetson Orin Nano · 7B SLM 量化</div>
+</div>
+
+<script src="js/demo.js"></script>
+
+</body>
+</html>
