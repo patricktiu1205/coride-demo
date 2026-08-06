@@ -1,155 +1,527 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>小马智行 · CoRide 渠道看板 — 运营商后台</title>
+<title>CoRide 超级管理后台</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div class="dashboard">
+<div class="admin-layout">
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="brand">🤖 小马智行<span class="sub"> · CoRide 渠道看板</span></div>
-    <div class="date" id="liveDate">2026.07.31 · 15:00 CST</div>
-    <div class="user-badge">👤 运营主管</div>
-  </div>
-
-  <!-- KPI Row -->
-  <div class="kpi-row">
-    <div class="kpi-card accent">
-      <div class="kpi-icon">📈</div>
-      <div class="kpi-body">
-        <div class="kpi-val" id="incOrders">138</div>
-        <div class="kpi-label">今日增量订单</div>
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span class="sl-dot"></span>CoRide</div>
+    <nav class="sidebar-nav">
+      <div class="sn-section">主菜单</div>
+      <a class="sn-item active" data-page="dashboard" onclick="navTo('dashboard')"><span class="sn-icon">📊</span> 仪表盘</a>
+      <div class="sn-section">业务管理</div>
+      <a class="sn-item" data-page="operators" onclick="navTo('operators')"><span class="sn-icon">🏢</span> 运营商管理</a>
+      <a class="sn-item" data-page="vehicles" onclick="navTo('vehicles')"><span class="sn-icon">🚗</span> 车辆管理</a>
+      <a class="sn-item" data-page="orders" onclick="navTo('orders')"><span class="sn-icon">📋</span> 订单管理</a>
+      <a class="sn-item" data-page="users" onclick="navTo('users')"><span class="sn-icon">👥</span> 用户管理</a>
+      <a class="sn-item" data-page="members" onclick="navTo('members')"><span class="sn-icon">👑</span> 会员管理</a>
+      <div class="sn-section">营收与运维</div>
+      <a class="sn-item" data-page="revenue" onclick="navTo('revenue')"><span class="sn-icon">💰</span> 营收分析</a>
+      <a class="sn-item" data-page="ota" onclick="navTo('ota')"><span class="sn-icon">🔄</span> OTA 升级</a>
+      <a class="sn-item" data-page="hardware" onclick="navTo('hardware')"><span class="sn-icon">🖥</span> 硬件资产</a>
+      <div class="sn-section">客服中心</div>
+      <a class="sn-item" data-page="chat" onclick="navTo('chat')"><span class="sn-icon">💬</span> 在线客服</a>
+      <div class="sn-section">系统</div>
+      <a class="sn-item" data-page="settings" onclick="navTo('settings')"><span class="sn-icon">⚙️</span> 系统设置</a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="su-avatar">张</div>
+      <div class="su-info">
+        <div class="su-name" id="sidebarUserName">系统管理员</div>
+        <div class="su-role">超级管理员</div>
       </div>
-      <div class="kpi-badge up">↑ 12% MoM</div>
+      <span class="su-logout" onclick="handleLogout()">退出</span>
     </div>
-    <div class="kpi-card accent">
-      <div class="kpi-icon">💰</div>
-      <div class="kpi-body">
-        <div class="kpi-val" id="incRevenue">¥41,262</div>
-        <div class="kpi-label">增量流水</div>
-      </div>
-      <div class="kpi-badge up">↑ 15% MoM</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">🚗</div>
-      <div class="kpi-body">
-        <div class="kpi-val"><span id="fleetOnline">47</span>/50</div>
-        <div class="kpi-label">加装车辆</div>
-      </div>
-      <div class="kpi-badge warn">3 台维护中</div>
-    </div>
-  </div>
+  </aside>
 
-  <!-- Middle Row: Heatmap + Vehicle Status -->
-  <div class="mid-row">
-    <!-- Heatmap -->
-    <div class="panel heatmap-panel">
-      <div class="panel-title">🗺 广州订单热力图</div>
-      <div class="heatmap">
-        <!-- Background districts -->
-        <div class="hm-zone" style="top:8%;left:8%;width:22%;height:18%"><span>白云区</span></div>
-        <div class="hm-zone" style="top:8%;left:34%;width:18%;height:14%"><span>天河区</span></div>
-        <div class="hm-zone" style="top:10%;left:56%;width:14%;height:12%"><span>黄埔区</span></div>
-        <div class="hm-zone" style="top:28%;left:10%;width:16%;height:25%"><span>越秀<br>荔湾</span></div>
-        <div class="hm-zone" style="top:28%;left:30%;width:22%;height:32%"><span>海珠区</span></div>
-        <div class="hm-zone" style="top:50%;left:56%;width:14%;height:18%"><span>番禺区</span></div>
-        <!-- Hotspots -->
-        <div class="hm-hot" style="top:5%;left:12%"><span>✈ 白云机场</span><div class="hm-count">CoRide 42单</div></div>
-        <div class="hm-hot" style="top:42%;left:62%"><span>🚄 广州南站</span><div class="hm-count">CoRide 38单</div></div>
-        <div class="hm-hot" style="top:22%;left:30%"><span>🏙 珠江新城</span><div class="hm-count">CoRide 29单</div></div>
-        <!-- Legend -->
-        <div class="hm-legend">
-          <span class="hm-leg-item"><span class="hm-dot coride"></span>CoRide 渠道</span>
-          <span class="hm-leg-item"><span class="hm-dot self"></span>自有渠道</span>
-        </div>
+  <!-- ═══ MAIN ═══ -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="th-left">
+        <div class="th-breadcrumb">CoRide <span>›</span> <span class="current" id="breadcrumb">仪表盘</span></div>
       </div>
-    </div>
+      <div class="th-right">
+        <div class="th-search">
+          <span class="th-search-icon">🔍</span>
+          <input type="text" placeholder="搜索订单/车辆/用户…" id="globalSearch" onkeyup="handleGlobalSearch(event)">
+        </div>
+        <div class="theme-toggle" onclick="toggleTheme()" title="切换日/夜模式" id="themeToggle">🌙</div>
+        <div class="th-notif" title="通知">🔔<span class="th-notif-dot"></span></div>
+        <div style="font-size:13px;color:var(--text-tertiary)" id="liveClock"></div>
+      </div>
+    </header>
 
-    <!-- Vehicle Status -->
-    <div class="panel vehicle-panel">
-      <div class="panel-title">🚗 车辆实时状态</div>
-      <div class="veh-list" id="vehList">
-        <div class="vl-item online">
-          <span class="vl-id">#A102</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥22</span><span class="vl-npu">NPU 58%</span>
-        </div>
-        <div class="vl-item online">
-          <span class="vl-id">#A107</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥25</span><span class="vl-npu">NPU 64%</span>
-        </div>
-        <div class="vl-item offline">
-          <span class="vl-id">#A112</span><span class="vl-status">🟡 离线</span><span class="vl-revenue">维护</span><span class="vl-npu">-</span>
-        </div>
-        <div class="vl-item online">
-          <span class="vl-id">#B003</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥19</span><span class="vl-npu">NPU 55%</span>
-        </div>
-        <div class="vl-item online">
-          <span class="vl-id">#B008</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥24</span><span class="vl-npu">NPU 71%</span>
-        </div>
-        <div class="vl-item fault">
-          <span class="vl-id">#B015</span><span class="vl-status">🔴 故障</span><span class="vl-revenue">待修</span><span class="vl-npu">-</span>
-        </div>
-        <div class="vl-item online">
-          <span class="vl-id">#A088</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥31</span><span class="vl-npu">NPU 49%</span>
-        </div>
-        <div class="vl-item online">
-          <span class="vl-id">#A095</span><span class="vl-status">🔵 在线</span><span class="vl-revenue">¥18</span><span class="vl-npu">NPU 62%</span>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- Content Area -->
+    <div class="content-area" id="contentArea">
 
-  <!-- Bottom Row -->
-  <div class="bottom-row">
-    <!-- 30-day trend -->
-    <div class="panel trend-panel">
-      <div class="panel-title">📈 近 30 天 CoRide 增量订单趋势</div>
-      <div class="trend-chart">
-        <div class="sparkline" id="sparkline">▁▂▃▄▅▆▇█▇▆▅▆▇▇██▇▆▅▆▇█▇▆▅▆▇██▇▆</div>
-        <div class="trend-labels">
-          <span>7/1 · 基线 45 单/天</span>
-          <span>当前 138 单/天 <b style="color:#27ae60">+206%</b></span>
+      <!-- ═══ 仪表盘 Dashboard ═══ -->
+      <div class="content-page active" id="page-dashboard">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kc-icon orange">📈</div>
+            <div class="kc-body"><div class="kc-val" id="kpiOrders">—</div><div class="kc-label">今日增量订单</div><div class="kc-change up">↑ 12% MoM</div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kc-icon green">💰</div>
+            <div class="kc-body"><div class="kc-val" id="kpiRevenue">—</div><div class="kc-label">增量流水</div><div class="kc-change up">↑ 15% MoM</div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kc-icon blue">🚗</div>
+            <div class="kc-body"><div class="kc-val"><span id="kpiFleet">47</span><span style="font-size:14px;color:var(--text-muted)">/50</span></div><div class="kc-label">车队车辆在线</div><div class="kc-change" style="color:var(--orange)">3 台维护中</div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kc-icon red">⭐</div>
+            <div class="kc-body"><div class="kc-val">4.9</div><div class="kc-label">用户评分</div><div class="kc-change up">↑ 0.2</div></div>
+          </div>
+        </div>
+
+        <div class="chart-row">
+          <div class="panel">
+            <div class="panel-title">🗺 各平台订单热力图</div>
+            <div class="heatmap">
+              <div class="hm-zone" style="top:8%;left:8%;width:22%;height:18%"><span>白云区</span></div>
+              <div class="hm-zone" style="top:8%;left:34%;width:18%;height:14%"><span>天河区</span></div>
+              <div class="hm-zone" style="top:10%;left:56%;width:14%;height:12%"><span>黄埔区</span></div>
+              <div class="hm-zone" style="top:28%;left:10%;width:16%;height:25%"><span>越秀/荔湾</span></div>
+              <div class="hm-zone" style="top:28%;left:30%;width:22%;height:32%"><span>海珠区</span></div>
+              <div class="hm-zone" style="top:50%;left:56%;width:14%;height:18%"><span>番禺区</span></div>
+              <div class="hm-hot" style="top:5%;left:12%"><span>✈ 白云机场</span><div class="hm-count">CoRide 350单</div></div>
+                            <div class="hm-hot" style="top:42%;left:62%"><span>🚄 广州南站</span><div class="hm-count">CoRide 280单</div></div>
+                            <div class="hm-hot" style="top:22%;left:30%"><span>🏙 珠江新城</span><div class="hm-count">CoRide 220单</div></div>
+              <div class="hm-legend">
+                <span class="hm-leg-item"><span class="hm-dot coride"></span>小马智行</span>
+                <span class="hm-leg-item"><span class="hm-dot self"></span>文远知行</span>
+                <span class="hm-leg-item"><span class="hm-dot" style="background:#4facfe"></span>百度Apollo</span>
+                <span class="hm-leg-item"><span class="hm-dot" style="background:#e74c3c"></span>AutoX</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🚗 车辆实时状态</div>
+            <div class="panel-body"><div class="veh-grid" id="vehGrid"></div></div>
+          </div>
+        </div>
+
+        <div class="trend-row">
+          <div class="panel">
+            <div class="panel-title">📈 近 30 天各平台订单趋势</div>
+            <div class="panel-body">
+              <div class="sparkline-chart" id="sparkline">▁▂▃▄▅▆▇█▇▆▅▆▇▇██▇▆▅▆▇█▇▆▅▆▇██▇▆</div>
+              <div class="trend-labels"><span>1月 · 全平台 ~450 单/天</span><span>当前 1,150 单/天 <b style="color:var(--green)">+156%</b></span></div>
+              <div class="trend-compare" style="margin-top:16px">
+                              <div class="tc-bar"><div class="tc-label">月初基线</div><div class="tc-track"><div class="tc-fill old" style="width:39%">~450</div></div></div>
+                              <div class="tc-bar"><div class="tc-label">当前日均</div><div class="tc-track"><div class="tc-fill new" style="width:100%">1,150</div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🛡️ Jet 设备健康</div>
+            <div class="panel-body">
+              <div class="js-item"><div class="js-val good">97.4%</div><div class="js-label">设备在线率</div><div class="js-bar"><div class="js-fill" style="width:97.4%"></div></div></div>
+              <div class="js-item"><div class="js-val">62%</div><div class="js-label">平均 NPU 负载</div><div class="js-bar"><div class="js-fill warn" style="width:62%"></div></div></div>
+              <div class="jet-summary" style="margin-top:12px"><span>✅ 47 正常</span><span>🟡 2 维护</span><span>🔴 1 故障</span></div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="trend-compare">
-        <div class="tc-bar"><div class="tc-label">接入前基线</div><div class="tc-track"><div class="tc-fill old" style="width:33%">45</div></div></div>
-        <div class="tc-bar"><div class="tc-label">当前日均</div><div class="tc-track"><div class="tc-fill new" style="width:100%">138</div></div></div>
-      </div>
-    </div>
 
-    <!-- Jet Health -->
-    <div class="panel jet-panel">
-      <div class="panel-title">🛡️ Jet 设备健康</div>
-      <div class="jet-stats">
-        <div class="js-item">
-          <div class="js-val good">97.4%</div>
-          <div class="js-label">设备在线率</div>
-          <div class="js-bar"><div class="js-fill" style="width:97.4%"></div></div>
+      <!-- ═══ 运营商管理 Operators ═══ -->
+      <div class="content-page" id="page-operators">
+        <div class="order-stat-row">
+          <div class="order-stat"><div class="os-val" id="opTotalVehicles">50</div><div class="os-label">平台总车辆</div></div>
+          <div class="order-stat"><div class="os-val" id="opOnlineRate">94%</div><div class="os-label">整体在线率（47/50）</div></div>
+          <div class="order-stat"><div class="os-val" id="opDailyOrders">138</div><div class="os-label">今日总订单</div></div>
+          <div class="order-stat"><div class="os-val">4</div><div class="os-label">接入平台</div></div>
         </div>
-        <div class="js-item">
-          <div class="js-val">62%</div>
-          <div class="js-label">平均 NPU 负载</div>
-          <div class="js-bar"><div class="js-fill warn" style="width:62%"></div></div>
+        <table class="data-table">
+          <thead><tr><th>平台名称</th><th>车辆数</th><th>在线率</th><th>今日订单</th><th>今日流水</th><th>均价</th><th>评分</th><th>接入状态</th><th>操作</th></tr></thead>
+          <tbody id="operatorTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- ═══ 车辆管理 Vehicles ═══ -->
+      <div class="content-page" id="page-vehicles">
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="vehFilter" onchange="renderVehicles()">
+              <option value="all">全部状态</option><option value="online">在线</option><option value="offline">离线</option><option value="fault">故障</option>
+            </select>
+            <input type="text" placeholder="搜索车辆ID…" id="vehSearch" oninput="renderVehicles()">
+          </div>
+          <span class="tt-count" id="vehCount">共 50 台</span>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" onclick="sortTable('vehicles','id')" id="vehThId">车辆ID <span class="sort-arrow">▲</span></th>
+            <th class="sortable" onclick="sortTable('vehicles','platform')" id="vehThPlatform">所属平台</th>
+            <th>车型</th>
+            <th class="sortable" onclick="sortTable('vehicles','status')" id="vehThStatus">状态</th>
+            <th class="sortable" onclick="sortTable('vehicles','npu')" id="vehThNpu">NPU 负载</th>
+            <th class="sortable" onclick="sortTable('vehicles','orders')" id="vehThOrders">今日订单</th>
+            <th class="sortable" onclick="sortTable('vehicles','revenue')" id="vehThRevenue">今日流水</th>
+            <th>硬件版本</th><th>软件版本</th><th>操作</th></tr></thead>
+          <tbody id="vehTableBody"></tbody>
+        </table>
+        <div class="pagination" id="vehPagination"></div>
+      </div>
+
+      <!-- ═══ 订单管理 Orders ═══ -->
+      <div class="content-page" id="page-orders">
+        <div class="order-stat-row">
+          <div class="order-stat"><div class="os-val" id="osToday">—</div><div class="os-label">今日订单</div></div>
+          <div class="order-stat"><div class="os-val" id="osRevenue">—</div><div class="os-label">今日流水</div></div>
+          <div class="order-stat"><div class="os-val" id="osCorideShare">-</div><div class="os-label">服务费收入</div></div>
+          <div class="order-stat"><div class="os-val" id="osCompleteRate">-</div><div class="os-label">完成率</div></div>
+          <div class="order-stat"><div class="os-val" id="osAvgPrice">-</div><div class="os-label">均单价</div></div>
+        </div>
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="orderFilter" onchange="renderOrders()">
+              <option value="all">全部状态</option><option value="completed">已完成</option><option value="ongoing">进行中</option><option value="cancelled">已取消</option>
+            </select>
+            <input type="text" placeholder="搜索订单号/车辆ID…" id="orderSearch" oninput="renderOrders()">
+          </div>
+          <span class="tt-count" id="orderCount">共 138 单</span>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" onclick="sortTable('orders','id')" id="ordThId">订单号</th>
+            <th>乘客</th><th>车辆</th><th>路线</th>
+            <th class="sortable" onclick="sortTable('orders','amount')" id="ordThAmount">金额</th>
+            <th>服务费</th>
+            <th>来源平台</th>
+            <th class="sortable" onclick="sortTable('orders','status')" id="ordThStatus">状态</th>
+            <th class="sortable" onclick="sortTable('orders','time')" id="ordThTime">时间 <span class="sort-arrow">▼</span></th>
+            <th>操作</th></tr></thead>
+          <tbody id="orderTableBody"></tbody>
+        </table>
+        <div class="pagination" id="orderPagination"></div>
+      </div>
+
+      <!-- ═══ 用户管理 Users ═══ -->
+      <div class="content-page" id="page-users">
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="userFilter" onchange="renderUsers()">
+              <option value="all">全部等级</option><option value="plus">Plus 会员</option><option value="regular">普通用户</option><option value="new">新用户</option>
+            </select>
+            <input type="text" placeholder="搜索姓名/手机号…" id="userSearch" oninput="renderUsers()">
+          </div>
+          <span class="tt-count" id="userCount">共 20 人</span>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" onclick="sortTable('users','name')" id="usrThName">用户</th>
+            <th>手机号</th>
+            <th class="sortable" onclick="sortTable('users','tier')" id="usrThTier">会员等级</th>
+            <th class="sortable" onclick="sortTable('users','trips')" id="usrThTrips">累计行程</th>
+            <th class="sortable" onclick="sortTable('users','spend')" id="usrThSpend">累计消费</th>
+            <th>偏好标签</th>
+            <th class="sortable" onclick="sortTable('users','regDate')" id="usrThReg">注册时间 <span class="sort-arrow">▼</span></th>
+            <th>操作</th></tr></thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+        <div class="pagination" id="userPagination"></div>
+      </div>
+
+      <!-- ═══ 客服工单 Tickets ═══ -->
+      <div class="content-page" id="page-tickets">
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="ticketFilter" onchange="renderTickets()">
+              <option value="all">全部状态</option><option value="open">待处理</option><option value="processing">处理中</option><option value="closed">已关闭</option>
+            </select>
+            <select id="ticketPriority" onchange="renderTickets()">
+              <option value="all">全部优先级</option><option value="high">高</option><option value="medium">中</option><option value="low">低</option>
+            </select>
+          </div>
+          <button class="ticket-btn" onclick="createTicket()">+ 新建工单</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>工单号</th><th>主题</th><th>用户</th><th>类型</th><th>优先级</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="ticketTableBody"></tbody>
+        </table>
+        <div class="pagination" id="ticketPagination"></div>
+      </div>
+
+      <!-- ═══ 在线客服 Chat ═══ -->
+      <div class="content-page" id="page-chat">
+        <div style="display:flex;gap:0;height:calc(100vh - 160px);min-height:500px">
+          <!-- Conversation list -->
+          <div style="width:280px;background:var(--bg-secondary);border-right:1px solid var(--border-default);border-radius:12px 0 0 12px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-default);font-size:14px;font-weight:700;color:var(--text-primary)">💬 在线会话</div>
+            <div style="flex:1;overflow-y:auto" id="chatConvList">
+              <div class="chat-conv-item" onclick="openChatConv('C001')" data-cid="C001">
+                <div class="cci-avatar" style="background:#F5A623">陈</div>
+                <div class="cci-info"><div class="cci-name">陈小明</div><div class="cci-preview">好的，我等等看</div></div>
+                <span class="cci-time">17:42</span><span class="cci-dot"></span>
+              </div>
+              <div class="chat-conv-item" onclick="openChatConv('C002')" data-cid="C002">
+                <div class="cci-avatar" style="background:#4facfe">李</div>
+                <div class="cci-info"><div class="cci-name">李婷婷</div><div class="cci-preview">那我的退款什么时候到？</div></div>
+                <span class="cci-time">17:30</span><span class="cci-dot"></span>
+              </div>
+              <div class="chat-conv-item" onclick="openChatConv('C003')" data-cid="C003">
+                <div class="cci-avatar" style="background:#27ae60">王</div>
+                <div class="cci-info"><div class="cci-name">王建国</div><div class="cci-preview">蓝牙还是连不上</div></div>
+                <span class="cci-time">16:55</span>
+              </div>
+              <div class="chat-conv-item" onclick="openChatConv('C004')" data-cid="C004">
+                <div class="cci-avatar" style="background:#e74c3c">赵</div>
+                <div class="cci-info"><div class="cci-name">赵丽华</div><div class="cci-preview">谢谢！</div></div>
+                <span class="cci-time">17:15</span><span class="cci-dot"></span>
+              </div>
+              <div class="chat-conv-item" onclick="openChatConv('C005')" data-cid="C005">
+                <div class="cci-avatar" style="background:#8e44ad">刘</div>
+                <div class="cci-info"><div class="cci-name">刘伟</div><div class="cci-preview">空调还是不行</div></div>
+                <span class="cci-time">15:20</span>
+              </div>
+            </div>
+          </div>
+          <!-- Chat area -->
+          <div style="flex:1;background:var(--bg-card);border-radius:0 12px 12px 0;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:1px solid var(--border-default);display:flex;align-items:center;justify-content:space-between" id="chatHeader">
+              <span style="font-size:14px;font-weight:700;color:var(--text-primary)">👤 陈小明</span>
+              <span style="font-size:10px;color:var(--green)" id="chatOnlineBadge">🟢 在线</span>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 18px" id="chatMessages">
+              <!-- C001 陈小明 -->
+              <div id="chatMsgsC001" class="chat-msg-group active">
+                <div class="chat-msg user"><div class="cm-bubble">你好，我刚下的订单 CO000042，费用好像多收了？<div class="cm-time">17:35</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">您好，我帮您查一下…订单 42 显示行程 18 分钟，费用 ¥24，请问您觉得哪里不对？<div class="cm-time">17:38</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">我 APP 上显示扣了我 ¥28<div class="cm-time">17:40</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">明白了，这可能是优惠券未抵扣。我帮您核实，5 分钟内回复您。<div class="cm-time">17:41</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">好的，我等等看<div class="cm-time">17:42</div></div></div>
+              </div>
+              <!-- C002 李婷婷 -->
+              <div id="chatMsgsC002" class="chat-msg-group">
+                <div class="chat-msg user"><div class="cm-bubble">你好，昨天我取消了一个订单，说会退款但还没收到<div class="cm-time">17:20</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">您好，请问是哪一单？我帮您查<div class="cm-time">17:22</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">CO000018<div class="cm-time">17:25</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">查到 CO000018 已于昨晚取消，退款已发起，微信到账通常 1-3 个工作日。<div class="cm-time">17:28</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">那我的退款什么时候到？<div class="cm-time">17:30</div></div></div>
+              </div>
+              <!-- C003 王建国 -->
+              <div id="chatMsgsC003" class="chat-msg-group">
+                <div class="chat-msg user"><div class="cm-bubble">蓝牙一直连不上车机，试了好几次<div class="cm-time">16:40</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">您好，请问手机型号是？<div class="cm-time">16:42</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">iPhone 15 Pro<div class="cm-time">16:45</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">iPhone 15 系列需要 iOS 18.2+ 才能稳定连接 BLE 5.0。建议您先升级系统，然后重启手机重试。<div class="cm-time">16:50</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">蓝牙还是连不上<div class="cm-time">16:55</div></div></div>
+              </div>
+              <!-- C004 赵丽华 -->
+              <div id="chatMsgsC004" class="chat-msg-group">
+                <div class="chat-msg user"><div class="cm-bubble">能不能把我的默认温度调低一点？每次上车都 25 度有点热<div class="cm-time">17:10</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">好的，我帮您把偏好向量里的温度从 25°C 调到 22°C。下次上车会自动生效。<div class="cm-time">17:13</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">谢谢！<div class="cm-time">17:15</div></div></div>
+              </div>
+              <!-- C005 刘伟 -->
+              <div id="chatMsgsC005" class="chat-msg-group">
+                <div class="chat-msg user"><div class="cm-bubble">昨天坐 #B003，空调开了但一点都不凉<div class="cm-time">15:00</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">收到，已通知维修团队检查 #B003 空调系统。抱歉给您带来不便。<div class="cm-time">15:10</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">什么时候能修好？<div class="cm-time">15:15</div></div></div>
+                <div class="chat-msg operator"><div class="cm-bubble">维修窗口安排在明天上午 9-11 点。修好后会短信通知您。<div class="cm-time">15:18</div></div></div>
+                <div class="chat-msg user"><div class="cm-bubble">空调还是不行<div class="cm-time">15:20</div></div></div>
+              </div>
+            </div>
+            <div style="padding:12px 18px;border-top:1px solid var(--border-default);display:flex;gap:10px" id="chatInputArea">
+              <input type="text" placeholder="输入回复…" id="chatInput" style="flex:1;padding:10px 14px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:8px;color:var(--text-primary);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')sendChatMsg()">
+              <button onclick="sendChatMsg()" style="padding:10px 18px;background:linear-gradient(135deg,var(--orange),var(--orange-dark));border:none;border-radius:8px;color:var(--text-on-dark);font-size:13px;font-weight:600;cursor:pointer" id="chatSendBtn">发送</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="jet-summary">
-        <span>✅ 47 台正常</span><span>🟡 2 台维护</span><span>🔴 1 台故障</span>
+<!-- ═══ 营收分析 Revenue ═══ -->
+      <div class="content-page" id="page-revenue">
+        <!-- ═══ KPI Row ═══ -->
+        <div class="kpi-grid" id="revKpiGrid"></div>
+
+        <!-- ═══ Chart Row 1: Stacked Bars + Donut ═══ -->
+        <div class="chart-row rev-chart-top">
+          <div class="panel" style="flex:2">
+            <div class="panel-title">📊 各平台服务费构成（今日已完成订单）</div>
+            <div class="panel-body">
+              <div class="rev-stacked-bars" id="revStackedBars"></div>
+              <div class="rev-bar-legend">
+                <span class="rev-leg-item"><span class="rev-leg-swatch" style="background:var(--orange)"></span>基础费 ¥2.50</span>
+                <span class="rev-leg-item"><span class="rev-leg-swatch" style="background:var(--blue)"></span>里程费 ¥0.15/km</span>
+                <span class="rev-leg-item"><span class="rev-leg-swatch" style="background:#2ecc71"></span>交互费 ¥1/次</span>
+                <span class="rev-leg-item"><span class="rev-leg-swatch" style="background:#9b59b6"></span>会员日均 ¥12/30</span>
+                <span class="rev-leg-item"><span class="rev-leg-swatch" style="background:#e67e22"></span>API分成 3%</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🍩 服务费占比</div>
+            <div class="panel-body" style="display:flex;align-items:center;justify-content:center;flex-direction:column">
+              <div class="rev-donut" id="revDonut">
+                <div class="rev-donut-center"><span id="revDonutTotal">¥0</span><small>今日已入账</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ Chart Row 2: 7-Day Trend ═══ -->
+        <div class="chart-row" style="grid-template-columns:1fr">
+          <div class="panel">
+            <div class="panel-title">📈 近 7 天服务费趋势</div>
+            <div class="panel-body">
+              <div class="rev-trend-grid" id="revTrendGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ Chart Row 3: Monthly Report ═══ -->
+        <div class="chart-row" style="grid-template-columns:1fr">
+          <div class="panel">
+            <div class="panel-title">📅 2026 年月度营收报告</div>
+            <div class="panel-body">
+              <div class="rev-monthly" id="revMonthly">
+                <div class="rev-monthly-chart" id="revMonthlyChart"></div>
+                <div class="rev-monthly-summary" id="revMonthlySummary"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ Detail Table ═══ -->
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-title">📋 收入明细表</div>
+          <div class="panel-body" style="padding:0">
+            <table class="data-table rev-detail-table">
+              <thead><tr><th>平台</th><th>总订单</th><th>已完成</th><th>基础费</th><th>里程费</th><th>交互费</th><th>已入账</th><th>预计收入</th><th class="rev-total-col">服务费合计</th></tr></thead>
+              <tbody id="revDetailBody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <span>CoRide 不抽票成 · 增量订单边际成本为零</span>
-    <span>小马智行运营中心</span>
-    <span>日均 23 单 → 138 单 (+500%)</span>
-  </div>
+      <!-- ═══ 会员管理 Members ═══ -->
+      <div class="content-page" id="page-members">
+        <div class="order-stat-row" id="memberStatRow"></div>
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="memberFilter" onchange="renderMembers()">
+              <option value="all">全部会员</option><option value="active">活跃</option><option value="expiring">即将到期</option><option value="expired">已过期</option>
+            </select>
+            <input type="text" placeholder="搜索会员姓名/手机号…" id="memberSearch" oninput="renderMembers()">
+          </div>
+          <span class="tt-count" id="memberCount">共 0 人</span>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" onclick="sortTable('members','id')" id="memThId">会员ID</th>
+            <th>姓名</th><th>手机号</th>
+            <th class="sortable" onclick="sortTable('members','trips')" id="memThTrips">累计行程</th>
+            <th class="sortable" onclick="sortTable('members','saved')" id="memThSaved">累计节省</th>
+            <th class="sortable" onclick="sortTable('members','since')" id="memThSince">开通日期</th>
+            <th>状态</th><th>操作</th>
+          </tr></thead>
+          <tbody id="memberTableBody"></tbody>
+        </table>
+      </div>
 
+      <!-- ═══ OTA 升级管理 ═══ -->
+      <div class="content-page" id="page-ota">
+        <div class="order-stat-row" id="otaStatRow"></div>
+        <div class="table-toolbar">
+          <div class="tt-left">
+            <select id="otaFilter" onchange="renderOTA()">
+              <option value="all">全部</option><option value="pending">可升级</option><option value="latest">已最新</option>
+            </select>
+            <input type="text" placeholder="搜索车辆ID…" id="otaSearch" oninput="renderOTA()">
+          </div>
+          <span class="tt-count" id="otaCount">共 50 台</span>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>车辆ID</th><th>所属平台</th><th>硬件版本</th>
+            <th>当前版本</th><th>可升级至</th>
+            <th>状态</th><th>操作</th>
+          </tr></thead>
+          <tbody id="otaTableBody"></tbody>
+        </table>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-title">📜 升级历史</div>
+          <div class="panel-body">
+            <table class="data-table" style="font-size:12px">
+              <thead><tr><th>时间</th><th>车辆</th><th>升级前</th><th>升级后</th><th>状态</th><th>操作人</th></tr></thead>
+              <tbody id="otaHistoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 硬件资产 Hardware ═══ -->
+      <div class="content-page" id="page-hardware">
+        <div class="order-stat-row" id="hwStatRow"></div>
+        <div class="chart-row">
+          <div class="panel">
+            <div class="panel-title">🖥 Jetson 外挂盒</div>
+            <div class="panel-body"><div id="hwJetsonDetail" style="font-size:13px;line-height:2"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📱 7寸触摸屏 + 📷 摄像头</div>
+            <div class="panel-body"><div id="hwPeriphDetail" style="font-size:13px;line-height:2"></div></div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-title">🚗 车辆硬件部署清单</div>
+          <div class="panel-body">
+            <table class="data-table" style="font-size:12px">
+              <thead><tr><th>车辆ID</th><th>Jetson SN</th><th>屏幕 SN</th><th>摄像头 SN</th><th>硬件版本</th><th>安装日期</th><th>状态</th></tr></thead>
+              <tbody id="hwDeployBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 系统设置 Settings ═══ -->
+      <div class="content-page" id="page-settings">
+        <div class="settings-section">
+          <div class="ss-title">👤 账号信息</div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">管理员账号</div><div class="sr-desc">用于登录管理后台</div></div><input type="text" value="admin@coride.cn"></div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">修改密码</div><div class="sr-desc">建议定期更换密码</div></div><input type="password" value="********" style="width:200px"><button class="ticket-btn" style="padding:6px 14px;font-size:11px;margin-left:8px">修改</button></div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">管理角色</div><div class="sr-desc">当前账号的权限级别</div></div><select><option>超级管理员</option><option>运营专员</option><option>客服主管</option></select></div>
+        </div>
+        <div class="settings-section">
+          <div class="ss-title">🔔 通知设置</div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">车辆故障告警</div><div class="sr-desc">车辆离线或NPU异常时推送</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">订单异常提醒</div><div class="sr-desc">用户投诉或订单异常时推送</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="settings-row"><div style="flex:1"><div class="sr-label">日报推送</div><div class="sr-desc">每日运营数据汇总</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="settings-section">
+          <div class="ss-title">📋 操作日志</div>
+          <table class="data-table">
+            <thead><tr><th>时间</th><th>操作人</th><th>操作</th><th>详情</th></tr></thead>
+            <tbody>
+              <tr><td>2026-08-06 17:30</td><td>张运营</td><td><span class="badge blue">查看</span></td><td>查看车辆 #A102 详情</td></tr>
+              <tr><td>2026-08-06 16:45</td><td>张运营</td><td><span class="badge orange">编辑</span></td><td>更新用户 U-118 会员等级</td></tr>
+              <tr><td>2026-08-06 15:20</td><td>李主管</td><td><span class="badge green">导出</span></td><td>导出 8 月运营报表</td></tr>
+              <tr><td>2026-08-06 14:10</td><td>张运营</td><td><span class="badge red">关闭</span></td><td>关闭工单 TK-042</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="settings-save" onclick="showToast('设置已保存')">💾 保存设置</button>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+</div><!-- /admin-layout -->
+
+<!-- Modal Container -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
 </div>
 
-<script src="js/demo.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
