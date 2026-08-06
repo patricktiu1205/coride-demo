@@ -123,3 +123,84 @@ body{background:#0a0a14;display:flex;justify-content:center;align-items:center;m
 
 /* Info overlay */
 .info-tag{position:absolute;top:10px;right:14px;background:rgba(0,0,0,.5);color:#888;font-size:9px;padding:3px 8px;border-radius:6px;z-index:10;pointer-events:none}
+
+/* ── Demo Wrapper & Skip Bar ── */
+.demo-wrapper{display:flex;flex-direction:column;align-items:center;gap:12px}
+.skip-bar{display:flex;align-items:center;gap:16px;padding:8px 20px;background:#1a1a2e;border-radius:10px;border:1px solid #2a2a40}
+.skip-btn{padding:8px 20px;background:linear-gradient(135deg,#F5A623,#e6951a);border:none;border-radius:8px;color:#111;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.skip-btn:hover{filter:brightness(1.15);transform:scale(1.03)}
+.skip-btn:active{transform:scale(.97)}
+.skip-btn:disabled{opacity:.4;cursor:not-allowed;filter:none;transform:none}
+.skip-info{font-size:12px;color:#888;min-width:200px;text-align:center}
+
+/* ── Journey Phase Label ── */
+.journey-phase{font-size:13px;color:#F5A623;font-weight:600;text-align:center;padding:4px 14px;background:rgba(245,166,35,.1);border-radius:14px;border:1px solid rgba(245,166,35,.25);transition:all .4s}
+.journey-phase.phase-blink{animation:phasePulse .5s ease}
+@keyframes phasePulse{0%,100%{background:rgba(245,166,35,.1)}50%{background:rgba(245,166,35,.3)}}
+
+/* ── Car Position Animation ── */
+.car-pos{position:absolute;font-size:22px;z-index:6;transition:all 3s ease-in-out;filter:drop-shadow(0 2px 6px rgba(79,172,254,.5))}
+
+/* ── BLE Overlay ── */
+.ble-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(13,17,23,.92);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .6s}
+.ble-overlay.hide{opacity:0;pointer-events:none}
+.ble-icon{font-size:48px;animation:blePulse 1.2s ease-in-out infinite}
+.ble-title{font-size:20px;font-weight:700;color:#e0e0e0}
+.ble-bar{width:260px;height:4px;background:#1e2a3a;border-radius:2px;overflow:hidden}
+.ble-fill{height:100%;background:linear-gradient(90deg,#4facfe,#F5A623);border-radius:2px;width:0%;transition:width .5s}
+.ble-steps{font-size:12px;color:#888;margin-top:4px}
+@keyframes blePulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.15);opacity:1}}
+
+/* ── CAN Bubble Variants ── */
+.can-bubble{position:absolute;border-radius:10px;padding:6px 10px;font-size:10px;z-index:7;animation:fadeUpIn .4s ease}
+.can-bubble.fast{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#e74c3c}
+.can-bubble.deep{background:rgba(79,172,254,.12);border:1px solid rgba(79,172,254,.35);color:#4facfe}
+.can-bubble .can-icon{font-size:13px;font-weight:700}
+.can-bubble .can-text{font-weight:600;margin-top:2px}
+.can-bubble .can-sub{font-size:9px;opacity:.7;margin-top:2px}
+
+/* ── Order Card ── */
+.order-card{position:absolute;bottom:90px;right:12px;background:linear-gradient(135deg,#1a2a1a,#1a1f2a);border:1px solid rgba(245,166,35,.3);border-radius:12px;padding:12px 16px;z-index:8;min-width:180px;animation:slideInRight .4s ease}
+.order-card .oc-header{font-size:14px;font-weight:700;color:#F5A623;margin-bottom:8px}
+.order-card .oc-item{font-size:13px;color:#ccc;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.order-card .oc-note{font-size:10px;color:#888;margin-top:8px;text-align:center}
+.order-card .oc-status{font-size:10px;color:#4facfe;text-align:center;margin-top:4px;animation:blink 1.5s infinite}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── YOLO Cabin Vision Panel ── */
+.yolo-panel{position:absolute;top:8px;right:8px;width:160px;background:rgba(0,0,0,.75);border:1px solid rgba(39,174,96,.3);border-radius:10px;padding:6px;z-index:9;font-size:9px}
+.yolo-header{color:#27ae60;font-weight:700;margin-bottom:4px;text-align:center;font-size:10px}
+.yolo-feed{position:relative;width:100%;height:90px;background:rgba(10,20,10,.6);border-radius:6px;overflow:hidden;border:1px solid rgba(39,174,96,.2)}
+.yolo-box{position:absolute;border:1.5px solid;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;transition:all .5s}
+.yolo-box.yolo-person{border-color:#27ae60;background:rgba(39,174,96,.15)}
+.yolo-box.yolo-bag{border-color:#F5A623;background:rgba(245,166,35,.15)}
+.yolo-box.yolo-phone{border-color:#e74c3c;background:rgba(231,76,60,.2);animation:yoloAlert .6s infinite}
+.yolo-status{color:#27ae60;font-size:9px;text-align:center;margin-top:3px;opacity:.8}
+@keyframes yoloAlert{0%,100%{border-color:#e74c3c}50%{border-color:#ff6b6b;box-shadow:0 0 8px rgba(231,76,60,.5)}}
+
+/* ── Agent Pipeline Indicator ── */
+.pipeline{position:absolute;bottom:50px;left:8px;right:8px;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 8px;background:rgba(0,0,0,.6);border-radius:8px;z-index:6;font-size:10px;backdrop-filter:blur(4px)}
+.pipeline .pl-stage{color:#555;font-weight:500;padding:2px 6px;border-radius:4px;transition:all .4s}
+.pipeline .pl-stage.active{color:#fff;background:rgba(245,166,35,.25);font-weight:700}
+.pipeline .pl-stage.done{color:#27ae60}
+.pipeline .pl-arrow{color:#333;font-size:9px}
+
+/* ── Data Wipe Overlay (fills car-display on journey end) ── */
+.wipe-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.94);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;border-radius:18px}
+.wipe-icon{font-size:64px;animation:blePulse 1.5s ease-in-out infinite}
+.wipe-title{font-size:26px;font-weight:700;color:#e74c3c;letter-spacing:2px}
+.wipe-bar{width:320px;height:5px;background:#1e2a3a;border-radius:3px;overflow:hidden}
+.wipe-fill{height:100%;background:linear-gradient(90deg,#e74c3c,#F5A623,#27ae60);border-radius:3px;width:0%;transition:width .8s}
+.wipe-text{font-size:14px;color:#aaa;margin-top:4px}
+.wipe-done{font-size:16px;color:#27ae60;font-weight:700;margin-top:8px;display:none}
+
+/* ── Agent Chat: dynamic message types ── */
+.agent-chat .msg .bubble.warn{background:#2a1f0a;border-left:2px solid #F5A623}
+.agent-chat .msg .bubble.alert{background:#2a0a0a;border-left:2px solid #e74c3c}
+.agent-chat .msg .bubble.info{background:#0a1a2a;border-left:2px solid #4facfe}
+.agent-chat .msg .bubble .user-line{color:#8f8;text-align:right;font-size:11px;padding:4px 0}
+.agent-chat .msg .bubble .phone-confirm{display:flex;align-items:center;gap:6px;background:rgba(245,166,35,.1);border-radius:8px;padding:6px 10px;margin-top:6px;font-size:10px;color:#F5A623}
+
+/* ── Enhanced Timeline ── */
+.timeline .tl-bar .tl-fill{transition:width 2s ease}
+.timeline .tl-bar .tl-dot{transition:left 2s ease}
