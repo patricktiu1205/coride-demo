@@ -49,7 +49,7 @@ function addOrder() {
 setInterval(addOrder, 4000);
 
 // ── Revenue Increment ──
-var revenue = 19270;
+var revenue = 63750;
 var orderCount = 8827;
 setInterval(function() {
   revenue += Math.floor(Math.random() * 3) + 2;
@@ -102,7 +102,7 @@ function addReview() {
 setInterval(addReview, 8000);
 
 // ── Cumulative Flow ──
-var cumFlow = 19270;
+var cumFlow = 63750;
 setInterval(function() {
   cumFlow += Math.floor(Math.random() * 6) + 3;
   document.getElementById('cumFlow').textContent = cumFlow.toLocaleString();
