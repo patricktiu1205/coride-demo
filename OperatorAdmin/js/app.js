@@ -176,6 +176,17 @@ function handleLogout() {
   window.location.href = "login.html";
 }
 
+
+// ═══ GLOBAL SEARCH ═══
+function handleGlobalSearch(e) {
+  if (e.key !== "Enter") return;
+  var val = e.target.value.toLowerCase().trim();
+  if (!val) return;
+  if (currentPage === "orders") { document.getElementById("orderSearch").value = val; orderPage = 1; renderOrders(); }
+  else if (currentPage === "vehicles") { document.getElementById("vehSearch").value = val; renderVehicles(); }
+  else if (currentPage === "ota") { document.getElementById("otaSearch").value = val; renderOTA(); }
+}
+
 // ═══ UPDATE SIDEBAR ═══
 function updateSidebar() {
   var nameEl = document.querySelector(".su-name");
@@ -810,7 +821,7 @@ function renderOrders() {
   var searchVal = search ? search.value.toLowerCase() : "";
   var filtered = allOrders.filter(function(o){
     if (filterVal !== "all" && o.status !== filterVal) return false;
-    if (searchVal && o.id.toLowerCase().indexOf(searchVal) === -1 && o.vehicle.toLowerCase().indexOf(searchVal) === -1 && o.passenger.toLowerCase().indexOf(searchVal) === -1) return false;
+    if (searchVal && o.id.toLowerCase().indexOf(searchVal) === -1 && o.vehicle.toLowerCase().indexOf(searchVal) === -1) return false;
     return true;
   });
   filtered = applySort(filtered, "orders");
@@ -834,7 +845,7 @@ function renderOrders() {
   for (var j = 0; j < pageData.length; j++) {
     var o = pageData[j];
     var stBadge = o.status === "completed" ? "<span class='badge green'>已完成</span>" : o.status === "ongoing" ? "<span class='badge blue'>进行中</span>" : "<span class='badge gray'>已取消</span>";
-    h += "<tr><td><b>" + o.id + "</b></td><td>" + o.passenger + "</td><td>" + o.vehicle + "</td><td>" + o.from + " → " + o.to + "</td><td>" + o.distance + "km</td><td>¥" + o.amount.toFixed(2) + "</td><td>" + stBadge + "</td><td>" + o.time + "</td><td><button class='dt-btn view' onclick='viewOrder(\"" + o.id + "\")'>详情</button></td></tr>";
+    h += "<tr><td><b>" + o.id + "</b></td><td>" + o.vehicle + "</td><td>" + o.from + " → " + o.to + "</td><td>¥" + o.amount.toFixed(2) + "</td><td>" + o.distance + "km</td><td>" + stBadge + "</td><td>" + o.time + "</td><td><button class='dt-btn view' onclick='viewOrder(\"" + o.id + "\")'>详情</button></td></tr>";
   }
   var tb = document.getElementById("orderTableBody"); if (tb) tb.innerHTML = h;
   var pg = document.getElementById("orderPagination"); if (pg) pg.innerHTML = renderPagination("orderPage", orderPage, totalPages, "renderOrders()");
@@ -846,7 +857,7 @@ function viewOrder(oid) {
   if (!o) return;
   var stBadge = o.status === "completed" ? "<span class='badge green'>已完成</span>" : o.status === "ongoing" ? "<span class='badge blue'>进行中</span>" : "<span class='badge gray'>已取消</span>";
   openModal("<div class='modal-header'><span class='mh-title'>📋 订单详情 " + o.id + "</span><span class='mh-close' onclick='closeModal()'>✕</span></div><div class='modal-body'>" +
-    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>乘客</div><div class='mb-val'>" + o.passenger + "</div></div><div class='mb-item'><div class='mb-label'>车辆</div><div class='mb-val'>" + o.vehicle + "</div></div><div class='mb-item'><div class='mb-label'>状态</div><div class='mb-val'>" + stBadge + "</div></div></div>" +
+    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>车辆</div><div class='mb-val'>" + o.vehicle + "</div></div><div class='mb-item'><div class='mb-label'>状态</div><div class='mb-val'>" + stBadge + "</div></div><div class='mb-item'><div class='mb-label'>距离</div><div class='mb-val'>" + o.distance + "km</div></div></div>" +
     "<div class='mb-section-title'>🗺 行程信息</div><div class='mb-row'><div class='mb-item'><div class='mb-label'>起点</div><div class='mb-val'>" + o.from + "</div></div><div class='mb-item'><div class='mb-label'>终点</div><div class='mb-val'>" + o.to + "</div></div><div class='mb-item'><div class='mb-label'>距离 / 时长</div><div class='mb-val'>" + o.distance + "km / " + o.duration + "分钟</div></div></div>" +
     "<div class='mb-section-title'>💰 费用明细</div><div class='mb-row'><div class='mb-item'><div class='mb-label'>乘车费</div><div class='mb-val'>¥" + o.amount.toFixed(2) + "</div></div><div class='mb-item'><div class='mb-label'>支付方式</div><div class='mb-val'>" + o.payment + "</div></div><div class='mb-item'><div class='mb-label'>下单时间</div><div class='mb-val'>" + o.time + "</div></div></div>" +
     "<div class='mb-row'><div class='mb-item'><div class='mb-label'>用户评分</div><div class='mb-val'>" + "⭐".repeat(o.rating) + "</div></div></div></div>");
