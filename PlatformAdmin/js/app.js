@@ -19,11 +19,12 @@ function navTo(page) {
   if (page === "dashboard") renderDashboard();
   if (page === "operators") renderOperators();
   if (page === "vehicles") { renderVehicles(); updateSortArrows("vehicles"); }
-  if (page === "orders") { renderOrders(); updateSortArrows("orders"); }
-  if (page === "users") { renderUsers(); updateSortArrows("users"); }
-  if (page === "members") { renderMembers(); updateSortArrows("members"); }
+  if (page === "orders") { orderPage = 1; renderOrders(); updateSortArrows("orders"); }
+  if (page === "users") { userPage = 1; renderUsers(); updateSortArrows("users"); }
+  if (page === "members") { memberPage = 1; renderMembers(); updateSortArrows("members"); }
   if (page === "revenue") renderRevenue();
   if (page === "ota") renderOTA();
+  if (page === "tickets") renderTickets();
   if (page === "hardware") renderHardware();
   if (page === "chat") renderChatConvs();
 }
@@ -36,17 +37,43 @@ var sortState = {
   members: {col:"since", dir:"desc"}
 };
 
+// ═══ PAGINATION ═══
+var orderPage = 1, userPage = 1, memberPage = 1;
+var pageSize = 30;
+
+function renderPagination(pageVar, page, totalPages, renderFn) {
+  if (totalPages <= 1) return "";
+  var h = '<div class="pagination">';
+  h += '<button class="pg-btn" onclick="' + pageVar + '=1;' + renderFn + '" ' + (page <= 1 ? "disabled" : "") + ' title="首页">«</button>';
+  h += '<button class="pg-btn" onclick="' + pageVar + '=' + (page - 1) + ';' + renderFn + '" ' + (page <= 1 ? "disabled" : "") + ' title="上一页">‹</button>';
+  var startPg = Math.max(1, page - 2);
+  var endPg = Math.min(totalPages, page + 2);
+  for (var p = startPg; p <= endPg; p++) {
+    h += '<button class="pg-btn' + (p === page ? ' active' : '') + '" onclick="' + pageVar + '=' + p + ';' + renderFn + '">' + p + '</button>';
+  }
+  h += '<button class="pg-btn" onclick="' + pageVar + '=' + (page + 1) + ';' + renderFn + '" ' + (page >= totalPages ? "disabled" : "") + ' title="下一页">›</button>';
+  h += '<button class="pg-btn" onclick="' + pageVar + '=' + totalPages + ';' + renderFn + '" ' + (page >= totalPages ? "disabled" : "") + ' title="末页">»</button>';
+  h += '<span class="pg-info">第 ' + page + '/' + totalPages + ' 页</span>';
+  h += '</div>';
+  return h;
+}
+
+// Reset page when filter/search changes
+function goOrderPage(p) { orderPage = p; renderOrders(); }
+function goUserPage(p) { userPage = p; renderUsers(); }
+function goMemberPage(p) { memberPage = p; renderMembers(); }
+
 function sortTable(table, col) {
   var ss = sortState[table];
   if (ss.col === col) { ss.dir = ss.dir === "asc" ? "desc" : "asc"; }
   else { ss.col = col; ss.dir = "asc"; }
   // Update arrow markers in headers
   updateSortArrows(table);
-  // Re-render
+  // Re-render with page reset
   if (table === "vehicles") renderVehicles();
-  else if (table === "orders") renderOrders();
-  else if (table === "users") renderUsers();
-  else if (table === "members") renderMembers();
+  else if (table === "orders") { orderPage = 1; renderOrders(); }
+  else if (table === "users") { userPage = 1; renderUsers(); }
+  else if (table === "members") { memberPage = 1; renderMembers(); }
 }
 
 function updateSortArrows(table) {
@@ -407,19 +434,24 @@ var orderRoutes = [
   {from:"白云机场",to:"广州南站",dist:55},
   {from:"珠江新城",to:"白云机场",dist:35}
 ];
-// 50 vehicles × 23 orders/day = 1,150
-for (var oi = 1; oi <= 1150; oi++) {
+// 50 vehicles × 23 orders/day = 1,150 — staggered across 08:00-21:59
+var baseH = 8, baseM = 0, baseS = 0;
+for (var oi = 0; oi < 1150; oi++) {
   var rt = orderRoutes[Math.floor(Math.random() * orderRoutes.length)];
   var dist = rt.dist + Math.floor(Math.random() * 6) - 3;
   if (dist < 3) dist = 3;
-  var hh = Math.floor(Math.random() * 14) + 8;   // 08:00–21:59
-  var mm = Math.floor(Math.random() * 60);
-  var timeStr = "2026-08-06 " + String(hh).padStart(2,"0") + ":" + String(mm).padStart(2,"0");
-  var minutesAgo = (21 - hh) * 60 + (54 - mm);     // current ≈ 21:54
+  // Stagger by 1-60s for unique timestamps
+  baseS += Math.floor(Math.random() * 60) + 1;
+  if (baseS >= 60) { baseM += Math.floor(baseS / 60); baseS = baseS % 60; }
+  if (baseM >= 60) { baseH += Math.floor(baseM / 60); baseM = baseM % 60; }
+  if (baseH >= 22) { baseH = 8; baseM = 0; baseS = 0; }
+  var timeStr = "2026-08-06 " + String(baseH).padStart(2,"0") + ":" + String(baseM).padStart(2,"0") + ":" + String(baseS).padStart(2,"0");
+  var tsPart = "20260806" + String(baseH).padStart(2,"0") + String(baseM).padStart(2,"0") + String(baseS).padStart(2,"0");
+  var totalMinutes = (baseH - 8) * 60 + baseM;
   var st;
-  if (minutesAgo <= 30)      { st = Math.random() < 0.7 ? "ongoing" : "completed"; }
-  else if (minutesAgo <= 90) { st = Math.random() < 0.25 ? "ongoing" : (Math.random() < 0.08 ? "cancelled" : "completed"); }
-  else                       { st = Math.random() < 0.06 ? "cancelled" : "completed"; }
+  // Only last 30min can be ongoing; older orders all completed/cancelled.
+  if (totalMinutes >= 380)       { st = Math.random() < 0.7 ? "ongoing" : "completed"; }
+  else                            { st = Math.random() < 0.06 ? "cancelled" : "completed"; }
   // Pick real user & vehicle from pools
   var user = allUsers[Math.floor(Math.random() * allUsers.length)];
   var veh  = allVehicles[Math.floor(Math.random() * allVehicles.length)];
@@ -435,8 +467,9 @@ for (var oi = 1; oi <= 1150; oi++) {
   var amount = Math.round(dist * farePerKm * 100) / 100;
   if (amount < 12) amount = 12;
   var pName = platformById[veh.platform] ? platformById[veh.platform].name : veh.platform;
+  var orderPlatform = veh.platform; // PX, WR, AP, AX
   allOrders.push({
-    id: "CO" + String(oi).padStart(6,"0"),
+    id: "CO-" + orderPlatform + "-" + tsPart,
     passenger: user.name,
     userId: user.id,
     userPhone: user.phone,
@@ -512,6 +545,18 @@ for (var uui = 0; uui < allUsers.length; uui++) {
   }
 }
 
+// ═══ Export shared data to localStorage for OperatorAdmin alignment ═══
+localStorage.setItem("coride_platform_data", JSON.stringify({
+  vehicles: allVehicles,
+  orders: allOrders
+}));
+
+// ═══ Pagination state ═══
+var orderPage = 1;
+var userPage = 1;
+var memberPage = 1;
+var pageSize = 30;
+
 function renderOrders() {
   var filter = document.getElementById("orderFilter").value;
   var search = document.getElementById("orderSearch").value.toLowerCase();
@@ -538,8 +583,12 @@ function renderOrders() {
   document.getElementById("osAvgPrice").textContent = "¥" + avgPrice.toFixed(2);
   document.getElementById("osCompleteRate").textContent = (allOrders.length > 0 ? (completedCount / allOrders.length * 100).toFixed(1) : "0") + "%";
   var h = "";
-  for (var i = 0; i < filtered.length; i++) {
-    var o = filtered[i];
+  var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  if (orderPage > totalPages) orderPage = totalPages;
+  var start = (orderPage - 1) * pageSize;
+  var pageData = filtered.slice(start, start + pageSize);
+  for (var i = 0; i < pageData.length; i++) {
+    var o = pageData[i];
     var stBadge = o.status === "completed" ? "<span class='badge green'>已完成</span>" : o.status === "ongoing" ? "<span class='badge blue'>进行中</span>" : "<span class='badge gray'>已取消</span>";
     var chColors = {"小马智行":"#F5A623","文远知行":"#4facfe","百度Apollo":"#2ecc71","AutoX":"#e74c3c"};
     var chBadge = "<span class='badge' style='background:" + (chColors[o.channel] || "#888") + ";color:#fff;font-size:10px'>" + o.channel + "</span>";
@@ -552,6 +601,7 @@ function renderOrders() {
     h += "<tr><td><b>" + o.id + "</b></td><td>" + o.passenger + memberBadge + "</td><td>" + o.vehicle + "</td><td>" + o.from + " → " + o.to + "</td><td>¥" + o.amount.toFixed(2) + "</td><td>" + feeLabel + "</td><td>" + chBadge + "</td><td>" + stBadge + "</td><td>" + o.time + "</td><td><button class='dt-btn view' onclick='viewOrder(\"" + o.id + "\")'>详情</button></td></tr>";
   }
   document.getElementById("orderTableBody").innerHTML = h;
+  document.getElementById("orderPagination").innerHTML = renderPagination("orderPage", orderPage, totalPages, "renderOrders()");
 }
 
 function viewOrder(oid) {
@@ -582,14 +632,19 @@ function renderUsers() {
   document.getElementById("userCount").textContent = "共 " + filtered.length + " 人";
   var colors = {plus:"#F5A623",regular:"#4facfe",new:"#27ae60"};
   var tierNames = {plus:"Plus 会员",regular:"普通用户",new:"新用户"};
+  var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  if (userPage > totalPages) userPage = totalPages;
+  var start = (userPage - 1) * pageSize;
+  var pageData = filtered.slice(start, start + pageSize);
   var h = "";
-  for (var i = 0; i < filtered.length; i++) {
-    var u = filtered[i];
+  for (var i = 0; i < pageData.length; i++) {
+    var u = pageData[i];
     var avatar = "<span class='user-avatar-sm' style='background:" + colors[u.tier] + "'>" + u.name.charAt(0) + "</span>";
     var tierBadge = "<span class='badge " + (u.tier === "plus" ? "orange" : u.tier === "regular" ? "blue" : "green") + "'>" + tierNames[u.tier] + "</span>";
     h += "<tr><td><div class='user-cell'>" + avatar + "<b>" + u.name + "</b></div></td><td>" + u.phone + "</td><td>" + tierBadge + "</td><td>" + u.trips + " 次</td><td>¥" + u.spend.toLocaleString() + "</td><td><span style='font-size:9px;color:#888'>" + u.tags.slice(0,3).join(" · ") + "</span></td><td>" + u.regDate + "</td><td><button class='dt-btn view' onclick='viewUser(\"" + u.id + "\")'>详情</button></td></tr>";
   }
   document.getElementById("userTableBody").innerHTML = h;
+  document.getElementById("userPagination").innerHTML = renderPagination("userPage", userPage, totalPages, "renderUsers()");
 }
 
 function viewUser(uid) {
@@ -606,55 +661,278 @@ function viewUser(uid) {
 
 
 // ═══ ═══ ═══ TICKET MANAGEMENT ═══ ═══ ═══
-var allTickets = (function(){
+// ═══ ═══ ═══ TICKETS (localStorage-synced + user support) ═══ ═══ ═══
+// User-facing support tickets (CoRide platform support)
+var supportTickets = (function(){
   var u = allUsers, v = allVehicles, o = allOrders;
   return [
-    {id:"TK-045",subject:"车辆 " + v[0].id + " CAN 信号断连",user:u[0].name,type:"故障报修",priority:"high",status:"open",time:"2026-08-06 17:20"},
-    {id:"TK-044",subject:"订单 " + (o.find(function(x){return x.status==="completed"})||o[0]).id + " 费用争议",user:u[1].name,type:"投诉",priority:"high",status:"processing",time:"2026-08-06 16:45"},
-    {id:"TK-043",subject:"蓝牙连接不上车机",user:u[2].name,type:"技术问题",priority:"medium",status:"processing",time:"2026-08-06 15:30"},
-    {id:"TK-042",subject:"建议增加夜间模式",user:u[3].name,type:"功能建议",priority:"low",status:"closed",time:"2026-08-06 14:10"},
-    {id:"TK-041",subject:"车辆 " + v[1].id + " 空调不制冷",user:u[4].name,type:"故障报修",priority:"medium",status:"processing",time:"2026-08-06 13:20"},
-    {id:"TK-040",subject:"APP 闪退问题反馈",user:u[5].name,type:"Bug反馈",priority:"high",status:"open",time:"2026-08-06 11:50"},
-    {id:"TK-039",subject:"车内音量无法调节",user:u[6].name,type:"技术问题",priority:"medium",status:"closed",time:"2026-08-06 10:15"},
-    {id:"TK-038",subject:"座椅按摩功能异常",user:u[7].name,type:"故障报修",priority:"low",status:"closed",time:"2026-08-05 18:30"},
-    {id:"TK-037",subject:"建议增加外卖配送功能",user:u[8].name,type:"功能建议",priority:"low",status:"open",time:"2026-08-05 16:00"},
-    {id:"TK-036",subject:"支付成功但未扣款",user:u[9].name,type:"支付问题",priority:"high",status:"processing",time:"2026-08-05 14:20"}
+    {id:"TK-045",title:"车辆 " + v[0].id + " CAN 信号断连",subject:"车辆 " + v[0].id + " CAN 信号断连",user:u[0].name,type:"故障报修",priority:"high",status:"open",time:"2026-08-06 17:20",direction:"user_support"},
+    {id:"TK-044",title:"订单 " + (o.find(function(x){return x.status==="completed"})||o[0]).id + " 费用争议",subject:"订单 " + (o.find(function(x){return x.status==="completed"})||o[0]).id + " 费用争议",user:u[1].name,type:"投诉",priority:"high",status:"processing",time:"2026-08-06 16:45",direction:"user_support"},
+    {id:"TK-043",title:"蓝牙连接不上车机",subject:"蓝牙连接不上车机",user:u[2].name,type:"技术问题",priority:"medium",status:"processing",time:"2026-08-06 15:30",direction:"user_support"},
+    {id:"TK-042",title:"建议增加夜间模式",subject:"建议增加夜间模式",user:u[3].name,type:"功能建议",priority:"low",status:"closed",time:"2026-08-06 14:10",direction:"user_support"},
+    {id:"TK-041",title:"车辆 " + v[1].id + " 空调不制冷",subject:"车辆 " + v[1].id + " 空调不制冷",user:u[4].name,type:"故障报修",priority:"medium",status:"processing",time:"2026-08-06 13:20",direction:"user_support"},
+    {id:"TK-040",title:"APP 闪退问题反馈",subject:"APP 闪退问题反馈",user:u[5].name,type:"Bug反馈",priority:"high",status:"open",time:"2026-08-06 11:50",direction:"user_support"},
+    {id:"TK-039",title:"车内音量无法调节",subject:"车内音量无法调节",user:u[6].name,type:"技术问题",priority:"medium",status:"closed",time:"2026-08-06 10:15",direction:"user_support"},
+    {id:"TK-038",title:"座椅按摩功能异常",subject:"座椅按摩功能异常",user:u[7].name,type:"故障报修",priority:"low",status:"closed",time:"2026-08-05 18:30",direction:"user_support"},
+    {id:"TK-037",title:"建议增加外卖配送功能",subject:"建议增加外卖配送功能",user:u[8].name,type:"功能建议",priority:"low",status:"open",time:"2026-08-05 16:00",direction:"user_support"},
+    {id:"TK-036",title:"支付成功但未扣款",subject:"支付成功但未扣款",user:u[9].name,type:"支付问题",priority:"high",status:"processing",time:"2026-08-05 14:20",direction:"user_support"}
   ];
 })();
 
+function getSharedTickets() {
+  var raw = localStorage.getItem("coride_shared_tickets");
+  if (raw) {
+    try { return JSON.parse(raw); } catch(e) {}
+  }
+  return [];
+}
+
+function saveSharedTicket(ticket) {
+  var all = getSharedTickets();
+  var found = false;
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].id === ticket.id) { all[i] = ticket; found = true; break; }
+  }
+  if (!found) all.push(ticket);
+  localStorage.setItem("coride_shared_tickets", JSON.stringify(all));
+}
+
+function getAllTickets() {
+  return supportTickets.concat(getSharedTickets());
+}
+
+// Seed shared tickets from PlatformAdmin side (source of truth)
+(function initPlatformTickets() {
+  var shared = getSharedTickets();
+  if (shared.length === 0) {
+    seedPlatformTickets();
+  }
+})();
+
+function seedPlatformTickets() {
+  var counter = 1;
+  var platforms = [
+    {id:"PX",name:"小马智行",vehCount:15},
+    {id:"WR",name:"文远知行",vehCount:12},
+    {id:"AP",name:"百度Apollo",vehCount:13},
+    {id:"AX",name:"AutoX 安途",vehCount:10}
+  ];
+
+  for (var pi = 0; pi < platforms.length; pi++) {
+    var op = platforms[pi];
+    var vehCount = op.vehCount;
+    var hw3 = Math.floor(vehCount * 0.2);
+    var hw2 = Math.floor(vehCount * 0.5);
+    var hw1 = vehCount - hw3 - hw2;
+    var v1 = op.id + "-001", v2 = op.id + "-002", v3 = op.id + "-003";
+
+    // CT tickets: CoRide → Operator (Jetson maintenance)
+    var ctTickets = [
+      {title:"JetPack 6.0 安全补丁推送",desc:"修复NPU内存泄漏漏洞(CVE-2026-3821)，请3个工作日内完成OTA升级，影响全部" + vehCount + "台车辆。",priority:"high",status:"pending"},
+      {title:"LiDAR传感器校准提醒（HW 3.0）",desc:"监测到" + hw3 + "台HW 3.0车辆LiDAR偏移超阈值，请安排校准维护。",priority:"medium",status:"pending"},
+      {title:"Jetson Orin Nano 散热模组维护（HW 2.0）",desc:"" + hw2 + "台HW 2.0车辆散热模组需本月清理，请安排轮流进站维护。",priority:"medium",status:"in_progress"},
+      {title:"摄像头模组老化更换建议（HW 1.0）",desc:"" + hw1 + "台HW 1.0车辆摄像头超3年，夜间识别精度下降，建议逐步更换。",priority:"low",status:"done"}
+    ];
+
+    // Operator-specific CT tickets
+    var opCT = {
+      "PX": [
+        {title:"小马智行·南沙区域5G信号优化",desc:"南沙运营区3台车辆偶发5G延迟超标(>200ms)，请检查对应Jetson网络模块。",priority:"medium",status:"pending"},
+        {title:"AutoPilot 感知模型推送 v4.2.1",desc:"针对小马智行车辆的定制感知模型，优化羊城通交叉路口识别准确率。",priority:"low",status:"pending"}
+      ],
+      "WR": [
+        {title:"文远知行·黄埔区高精地图更新",desc:"黄埔区3处新设立交通标识需同步至车载地图，涉及6台车辆。",priority:"medium",status:"pending"},
+        {title:"WeRide Driver 固件对齐验证",desc:"请验证WR全系车辆Driver固件v3.18兼容性，确保与JetPack 6.0无冲突。",priority:"high",status:"in_progress"}
+      ],
+      "AP": [
+        {title:"百度Apollo·V2X 路侧单元对接测试",desc:"天河CBD新增5个V2X路侧单元，8台车辆需完成对接测试。",priority:"medium",status:"pending"},
+        {title:"Apollo ADFM 大模型推送 v2.0",desc:"端到端自动驾驶大模型更新，需全部Apollo车辆验证推理延时达标。",priority:"high",status:"pending"}
+      ],
+      "AX": [
+        {title:"AutoX·Gen5 传感器套件校准",desc:"AutoX Gen5传感器套件季度校准到期，HW3.0车辆优先安排。",priority:"medium",status:"pending"},
+        {title:"AutoX XCU 域控制器诊断日志",desc:"部分XCU上报偶发watchdog复位，请导出近30天诊断日志提交分析。",priority:"medium",status:"in_progress"}
+      ]
+    };
+
+    var extra = opCT[op.id] || [];
+    var allCT = ctTickets.concat(extra);
+
+    for (var ci = 0; ci < allCT.length; ci++) {
+      var ct = allCT[ci];
+      saveSharedTicket({
+        id: "CT-" + String(counter).padStart(3,"0"),
+        type: "maintenance",
+        title: ct.title,
+        description: ct.desc,
+        status: ct.status,
+        priority: ct.priority,
+        vehicle: null,
+        operatorId: op.id,
+        direction: "coride_to_operator",
+        createdAt: "2026-08-0" + (ci+1) + " " + (10+ci) + ":30",
+        from: "CoRide"
+      });
+      counter++;
+    }
+
+    // OT tickets: Operator → CoRide (offline/repair)
+    var otTickets = {
+      "PX": [
+        {type:"offline",title:"车辆 " + v3 + " 计划下线通知",desc:"该车将于下周一起临时下线进行常规保养，预计3个工作日后恢复运营。",priority:"medium",status:"pending",vehicle:v3},
+        {type:"repair",title:"车辆 " + v2 + " 返厂维修申请",desc:"NPU出现过热保护，已离线。需返厂更换散热模块，预计维修周期5-7天。",priority:"high",status:"in_progress",vehicle:v2}
+      ],
+      "WR": [
+        {type:"offline",title:"车辆 " + v2 + " 临时停运报备",desc:"为配合黄埔区道路施工，该车8月10-12日暂停运营，已同步通知乘客。",priority:"low",status:"pending",vehicle:v2},
+        {type:"repair",title:"车辆 " + v3 + " 触摸屏触控故障维修",desc:"用户多次投诉触控屏漂移，已离线检测，疑似驱动芯片故障，申请返厂更换。",priority:"high",status:"pending",vehicle:v3}
+      ],
+      "AP": [
+        {type:"offline",title:"车辆 " + v3 + " 计划下线升级通知",desc:"该车计划下线安装ADFM大模型v2.0，预计停机4小时。",priority:"medium",status:"done",vehicle:v3},
+        {type:"repair",title:"车辆 " + v2 + " V2X通信模块异常",desc:"RSU对接测试中发现该车V2X时延超标3倍，需更换通信模块。",priority:"high",status:"in_progress",vehicle:v2}
+      ],
+      "AX": [
+        {type:"offline",title:"车辆 " + v2 + " 例行保养下线通知",desc:"按季度保养计划，该车将于8月9日下线一日进行Gen5传感器套件校准。",priority:"medium",status:"pending",vehicle:v2},
+        {type:"repair",title:"车辆 " + v3 + " XCU域控制器异常",desc:"XCU上报多次watchdog复位，系统诊断建议返厂更换控制器。",priority:"high",status:"pending",vehicle:v3}
+      ]
+    };
+
+    var ots = otTickets[op.id] || [];
+    for (var oi = 0; oi < ots.length; oi++) {
+      var ot = ots[oi];
+      saveSharedTicket({
+        id: "OT-" + String(counter).padStart(3,"0"),
+        type: ot.type,
+        title: ot.title,
+        description: ot.desc,
+        status: ot.status,
+        priority: ot.priority,
+        vehicle: ot.vehicle,
+        operatorId: op.id,
+        direction: "operator_to_coride",
+        createdAt: "2026-08-0" + (6-oi) + " " + (14+oi) + ":20",
+        from: op.name
+      });
+      counter++;
+    }
+  }
+}
+
 function renderTickets() {
-  var filter = document.getElementById("ticketFilter").value;
-  var priority = document.getElementById("ticketPriority").value;
+  var filter = document.getElementById("ticketFilter");
+  var priority = document.getElementById("ticketPriority");
+  var filterVal = filter ? filter.value : "all";
+  var priorityVal = priority ? priority.value : "all";
+  
+  var allTickets = getAllTickets();
   var filtered = allTickets.filter(function(t){
-    if (filter !== "all" && t.status !== filter) return false;
-    if (priority !== "all" && t.priority !== priority) return false;
+    // Normalize status: support tickets use open/processing/closed, shared use pending/in_progress/done
+    var st = t.status;
+    var stNorm = (st === "open" || st === "pending") ? "pending" : (st === "processing" || st === "in_progress") ? "in_progress" : "done";
+    if (filterVal === "pending" && stNorm !== "pending") return false;
+    if (filterVal === "processing" && stNorm !== "in_progress") return false;
+    if (filterVal === "closed" && stNorm !== "done") return false;
+    if (priorityVal !== "all" && t.priority !== priorityVal) return false;
     return true;
   });
+  
   var h = "";
   for (var i = 0; i < filtered.length; i++) {
     var t = filtered[i];
-    var stBadge = t.status === "open" ? "<span class='badge red'>待处理</span>" : t.status === "processing" ? "<span class='badge orange'>处理中</span>" : "<span class='badge gray'>已关闭</span>";
+    var isSupport = t.direction === "user_support";
+    var isCorideToOp = t.direction === "coride_to_operator";
+    var isOpToCoride = t.direction === "operator_to_coride";
+    
+    // Normalize status
+    var st = t.status;
+    var stNorm = (st === "open" || st === "pending") ? "pending" : (st === "processing" || st === "in_progress") ? "in_progress" : "done";
+    var stLabel = stNorm === "pending" ? "待处理" : stNorm === "in_progress" ? "处理中" : "已完成";
+    var stClass = stNorm === "pending" ? "red" : stNorm === "in_progress" ? "orange" : "green";
+    var stBadge = "<span class='badge " + stClass + "'>" + stLabel + "</span>";
+    
     var priClass = t.priority === "high" ? "high" : t.priority === "medium" ? "medium" : "low";
-    h += "<tr><td><b>" + t.id + "</b></td><td>" + t.subject + "</td><td>" + t.user + "</td><td>" + t.type + "</td><td><span class='ticket-priority " + priClass + "'>" + (t.priority === "high" ? "🔴 高" : t.priority === "medium" ? "🟡 中" : "🟢 低") + "</span></td><td>" + stBadge + "</td><td>" + t.time + "</td><td><button class='dt-btn view' onclick='viewTicket(\"" + t.id + "\")'>详情</button></td></tr>";
+    var priLabel = t.priority === "high" ? "🔴 高" : t.priority === "medium" ? "🟡 中" : "🟢 低";
+    
+    var title = t.title || t.subject || "";
+    var from = isSupport ? t.user : t.from;
+    var dirLabel = isSupport ? "👤 用户" : isCorideToOp ? "📤 CoRide→" + (t.operatorId||"运营商") : "📥 运营商→CoRide";
+    var type = t.type;
+    var typeNames = {maintenance:"Jetson维护",offline:"下线通知",repair:"返厂维修",upgrade:"升级申请","other":"其他","故障报修":"故障报修","投诉":"投诉","技术问题":"技术问题","功能建议":"功能建议","Bug反馈":"Bug反馈","支付问题":"支付问题"};
+    
+    h += "<tr><td><b>" + t.id + "</b></td><td>" + title + "</td><td>" + from + "</td><td>" + (typeNames[type] || type) + "</td><td><span style='font-size:11px;color:var(--orange)'>" + dirLabel + "</span></td><td><span class='ticket-priority " + priClass + "'>" + priLabel + "</span></td><td>" + stBadge + "</td><td>" + (t.time || t.createdAt) + "</td><td><button class='dt-btn view' onclick='viewTicket(\"" + t.id + "\")'>详情</button>" + (!isSupport && stNorm !== "done" ? " <button class='dt-btn warn' onclick='platformToggleTicket(\"" + t.id + "\")'>处理</button>" : "") + "</td></tr>";
   }
-  document.getElementById("ticketTableBody").innerHTML = h;
+  var tb = document.getElementById("ticketTableBody");
+  if (tb) tb.innerHTML = h || "<tr><td colspan='9' style='text-align:center;color:var(--text-dim);padding:20px'>暂无工单</td></tr>";
+}
+
+function platformToggleTicket(tid) {
+  var all = getSharedTickets();
+  var t = null;
+  for (var i = 0; i < all.length; i++) { if (all[i].id === tid) { t = all[i]; break; } }
+  if (!t) return;
+  // Cycle: pending → in_progress → done
+  var next = t.status === "pending" ? "in_progress" : t.status === "in_progress" ? "done" : "pending";
+  t.status = next;
+  saveSharedTicket(t);
+  var statusNames = {pending:"待处理",in_progress:"处理中",done:"已完成"};
+  showToast("工单 " + tid + " → " + (statusNames[next] || next));
+  renderTickets();
 }
 
 function viewTicket(tid) {
-  var t = allTickets.find(function(x){ return x.id === tid; });
+  var allTickets = getAllTickets();
+  var t = null;
+  for (var i = 0; i < allTickets.length; i++) { if (allTickets[i].id === tid) { t = allTickets[i]; break; } }
   if (!t) return;
+  var isSupport = t.direction === "user_support";
+  var isCorideToOp = t.direction === "coride_to_operator";
+  var title = t.title || t.subject || "";
+  var desc = t.description || t.subject || "";
+  var from = isSupport ? t.user : t.from;
+  var typeNames = {maintenance:"Jetson维护",offline:"下线通知",repair:"返厂维修",upgrade:"升级申请","other":"其他"};
+  var st = t.status;
+  var stLabel = (st === "open" || st === "pending") ? "待处理" : (st === "processing" || st === "in_progress") ? "处理中" : "已完成";
+  var vehHtml = t.vehicle ? "<div class='mb-item'><div class='mb-label'>关联车辆</div><div class='mb-val'>🚗 " + t.vehicle + "</div></div>" : "";
+  
   openModal("<div class='modal-header'><span class='mh-title'>🎧 工单 " + t.id + "</span><span class='mh-close' onclick='closeModal()'>✕</span></div><div class='modal-body'>" +
-    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>主题</div><div class='mb-val'>" + t.subject + "</div></div><div class='mb-item'><div class='mb-label'>用户</div><div class='mb-val'>" + t.user + "</div></div></div>" +
-    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>类型</div><div class='mb-val'>" + t.type + "</div></div><div class='mb-item'><div class='mb-label'>优先级</div><div class='mb-val'>" + (t.priority === "high" ? "🔴 高" : t.priority === "medium" ? "🟡 中" : "🟢 低") + "</div></div><div class='mb-item'><div class='mb-label'>状态</div><div class='mb-val'>" + (t.status === "open" ? "待处理" : t.status === "processing" ? "处理中" : "已关闭") + "</div></div></div>" +
+    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>主题</div><div class='mb-val'>" + title + "</div></div><div class='mb-item'><div class='mb-label'>来源</div><div class='mb-val'>" + from + "</div></div></div>" +
+    "<div class='mb-row'><div class='mb-item'><div class='mb-label'>类型</div><div class='mb-val'>" + (typeNames[t.type] || t.type) + "</div></div><div class='mb-item'><div class='mb-label'>优先级</div><div class='mb-val'>" + (t.priority === "high" ? "🔴 高" : t.priority === "medium" ? "🟡 中" : "🟢 低") + "</div></div><div class='mb-item'><div class='mb-label'>状态</div><div class='mb-val'>" + stLabel + "</div></div></div>" +
+    vehHtml +
+    "<div class='mb-section-title'>📝 描述</div><div class='mb-val' style='margin-bottom:12px'>" + desc + "</div>" +
     "<div class='mb-section-title'>💬 处理记录</div>" +
-    "<div style='padding:12px;background:#0d1117;border-radius:8px;font-size:12px;color:#888'><div style='margin-bottom:8px'><span style='color:#4facfe'>系统</span> · " + t.time + "<br>" + t.subject + " — 已创建工单</div>" +
-    (t.status !== "open" ? "<div style='margin-bottom:8px'><span style='color:#F5A623'>张运营</span> · " + t.time + "<br>已接单，正在排查处理中…</div>" : "") +
-    (t.status === "closed" ? "<div><span style='color:#27ae60'>系统</span> · " + t.time + "<br>工单已关闭 ✓</div>" : "") + "</div>" +
+    "<div style='padding:12px;background:#0d1117;border-radius:8px;font-size:12px;color:#888'><div style='margin-bottom:8px'><span style='color:#4facfe'>系统</span> · " + (t.time || t.createdAt) + "<br>" + title + " — 已创建工单</div>" +
+    (st !== "pending" && st !== "open" ? "<div style='margin-bottom:8px'><span style='color:#F5A623'>张运营</span> · " + (t.time || t.createdAt) + "<br>已接单，正在排查处理中…</div>" : "") +
+    (st === "closed" || st === "done" ? "<div><span style='color:#27ae60'>系统</span> · " + (t.time || t.createdAt) + "<br>工单已关闭 ✓</div>" : "") + "</div>" +
     "</div>");
 }
 
-function createTicket() {
-  showToast("工单创建功能已触发（Demo）");
+function createCoRideMaintenanceTicket() {
+  // CoRide platform creates a Jetson maintenance ticket → shown in OperatorAdmin
+  var raw = localStorage.getItem("coride_shared_tickets");
+  var all = raw ? JSON.parse(raw) : [];
+  var maxNum = 0;
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].id.indexOf("CT-") === 0) {
+      var n = parseInt(all[i].id.split("-")[1]);
+      if (n > maxNum) maxNum = n;
+    }
+  }
+  var newId = "CT-" + String(maxNum + 1).padStart(3,"0");
+  var newTicket = {
+    id: newId,
+    type: "maintenance",
+    title: "Jetson 系统例行维护通知",
+    description: "CoRide平台统一下发：请各运营商检查车辆Jetson设备运行状态，确保固件为最新版本。",
+    status: "pending",
+    priority: "medium",
+    vehicle: null,
+    operatorId: null, // null = all operators
+    direction: "coride_to_operator",
+    createdAt: new Date().toISOString().slice(0,16).replace("T"," "),
+    from: "CoRide"
+  };
+  all.push(newTicket);
+  localStorage.setItem("coride_shared_tickets", JSON.stringify(all));
+  showToast("维护工单 " + newId + " 已下发至全部运营商");
+  renderTickets();
 }
 
 
@@ -1181,13 +1459,18 @@ function renderMembers() {
   msH += '<div class="order-stat"><div class="os-val">¥' + (activeCount * 12).toLocaleString() + '</div><div class="os-label">月费收入</div></div>';
   msH += '<div class="order-stat"><div class="os-val">¥' + totalSaved.toLocaleString(undefined, {minimumFractionDigits:2}) + '</div><div class="os-label">累计用户节省</div></div>';
   document.getElementById("memberStatRow").innerHTML = msH;
+  var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  if (memberPage > totalPages) memberPage = totalPages;
+  var start = (memberPage - 1) * pageSize;
+  var pageData = filtered.slice(start, start + pageSize);
   var h = "";
-  for (var m = 0; m < filtered.length; m++) {
-    var mb = filtered[m];
+  for (var m = 0; m < pageData.length; m++) {
+    var mb = pageData[m];
     var stBadge = mb.status === "active" ? "<span class='badge green'>活跃</span>" : mb.status === "expiring" ? "<span class='badge orange'>即将到期</span>" : "<span class='badge gray'>已过期</span>";
     h += "<tr><td><b>" + mb.id + "</b></td><td>" + mb.name + " 👑</td><td>" + mb.phone + "</td><td>" + mb.trips + " 次</td><td>¥" + mb.saved.toFixed(2) + "</td><td>" + mb.since + "</td><td>" + stBadge + "</td><td><button class='dt-btn view' onclick='viewMember(\"" + mb.id + "\")'>详情</button></td></tr>";
   }
   document.getElementById("memberTableBody").innerHTML = h;
+  document.getElementById("memberPagination").innerHTML = renderPagination("memberPage", memberPage, totalPages, "renderMembers()");
 }
 
 function viewMember(mid) {

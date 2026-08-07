@@ -178,6 +178,14 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:-apple-s
 .dt-btn.edit{color:var(--orange);border-color:rgba(245,166,35,.3)}
 .dt-btn.edit:hover{background:rgba(245,166,35,.1)}
 
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:16px 0 4px}
+.pg-btn{padding:6px 12px;border:1px solid var(--border-default);border-radius:6px;background:var(--bg-secondary);color:var(--text-primary);font-size:12px;cursor:pointer;min-width:32px;transition:all .15s}
+.pg-btn:hover:not(:disabled){border-color:var(--orange);color:var(--orange)}
+.pg-btn.active{background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600}
+.pg-btn:disabled{opacity:.35;cursor:not-allowed}
+.pg-info{font-size:11px;color:var(--text-muted);margin-left:8px}
+
 /* Badges */
 .badge{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block}
 .badge.green{background:rgba(39,174,96,.15);color:var(--green)}

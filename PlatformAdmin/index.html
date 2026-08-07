@@ -25,6 +25,7 @@
       <div class="sn-section">营收与运维</div>
       <a class="sn-item" data-page="revenue" onclick="navTo('revenue')"><span class="sn-icon">💰</span> 营收分析</a>
       <a class="sn-item" data-page="ota" onclick="navTo('ota')"><span class="sn-icon">🔄</span> OTA 升级</a>
+      <a class="sn-item" data-page="tickets" onclick="navTo('tickets')"><span class="sn-icon">🎫</span> 工单管理</a>
       <a class="sn-item" data-page="hardware" onclick="navTo('hardware')"><span class="sn-icon">🖥</span> 硬件资产</a>
       <div class="sn-section">客服中心</div>
       <a class="sn-item" data-page="chat" onclick="navTo('chat')"><span class="sn-icon">💬</span> 在线客服</a>
@@ -184,10 +185,10 @@
         </div>
         <div class="table-toolbar">
           <div class="tt-left">
-            <select id="orderFilter" onchange="renderOrders()">
+            <select id="orderFilter" onchange="orderPage=1;renderOrders()">
               <option value="all">全部状态</option><option value="completed">已完成</option><option value="ongoing">进行中</option><option value="cancelled">已取消</option>
             </select>
-            <input type="text" placeholder="搜索订单号/车辆ID…" id="orderSearch" oninput="renderOrders()">
+            <input type="text" placeholder="搜索订单号/车辆ID…" id="orderSearch" oninput="orderPage=1;renderOrders()">
           </div>
           <span class="tt-count" id="orderCount">共 138 单</span>
         </div>
@@ -210,10 +211,10 @@
       <div class="content-page" id="page-users">
         <div class="table-toolbar">
           <div class="tt-left">
-            <select id="userFilter" onchange="renderUsers()">
+            <select id="userFilter" onchange="userPage=1;renderUsers()">
               <option value="all">全部等级</option><option value="plus">Plus 会员</option><option value="regular">普通用户</option><option value="new">新用户</option>
             </select>
-            <input type="text" placeholder="搜索姓名/手机号…" id="userSearch" oninput="renderUsers()">
+            <input type="text" placeholder="搜索姓名/手机号…" id="userSearch" oninput="userPage=1;renderUsers()">
           </div>
           <span class="tt-count" id="userCount">共 20 人</span>
         </div>
@@ -237,16 +238,18 @@
         <div class="table-toolbar">
           <div class="tt-left">
             <select id="ticketFilter" onchange="renderTickets()">
-              <option value="all">全部状态</option><option value="open">待处理</option><option value="processing">处理中</option><option value="closed">已关闭</option>
+              <option value="all">全部状态</option><option value="pending">待处理</option><option value="processing">处理中</option><option value="closed">已完成</option>
             </select>
             <select id="ticketPriority" onchange="renderTickets()">
               <option value="all">全部优先级</option><option value="high">高</option><option value="medium">中</option><option value="low">低</option>
             </select>
           </div>
-          <button class="ticket-btn" onclick="createTicket()">+ 新建工单</button>
+          <div style="display:flex;gap:8px">
+            <button class="ticket-btn" onclick="createCoRideMaintenanceTicket()">📤 下发维护工单</button>
+          </div>
         </div>
         <table class="data-table">
-          <thead><tr><th>工单号</th><th>主题</th><th>用户</th><th>类型</th><th>优先级</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>工单号</th><th>主题</th><th>来源</th><th>类型</th><th>方向</th><th>优先级</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
           <tbody id="ticketTableBody"></tbody>
         </table>
         <div class="pagination" id="ticketPagination"></div>
@@ -409,10 +412,10 @@
         <div class="order-stat-row" id="memberStatRow"></div>
         <div class="table-toolbar">
           <div class="tt-left">
-            <select id="memberFilter" onchange="renderMembers()">
+            <select id="memberFilter" onchange="memberPage=1;renderMembers()">
               <option value="all">全部会员</option><option value="active">活跃</option><option value="expiring">即将到期</option><option value="expired">已过期</option>
             </select>
-            <input type="text" placeholder="搜索会员姓名/手机号…" id="memberSearch" oninput="renderMembers()">
+            <input type="text" placeholder="搜索会员姓名/手机号…" id="memberSearch" oninput="memberPage=1;renderMembers()">
           </div>
           <span class="tt-count" id="memberCount">共 0 人</span>
         </div>
@@ -427,6 +430,7 @@
           </tr></thead>
           <tbody id="memberTableBody"></tbody>
         </table>
+        <div class="pagination" id="memberPagination"></div>
       </div>
 
       <!-- ═══ OTA 升级管理 ═══ -->
